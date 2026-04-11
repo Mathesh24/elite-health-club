@@ -1,26 +1,63 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-brand: #157070;
+  --color-accent: #D4A843;
+  --color-neutral-dark: #0E1E1A;
+  --color-light: #EDF5F1;
+  --color-surface: #F8FBFA;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand: var(--color-brand);
+  --color-accent: var(--color-accent);
+  --color-neutral-dark: var(--color-neutral-dark);
+  --color-light: var(--color-light);
+  --color-surface: var(--color-surface);
+
+  /* Reference next/font CSS variables set on <html> by layout.tsx */
+  --font-display: var(--font-inter);
+  --font-body: var(--font-inter);
+  --font-hero: var(--font-poppins);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Smooth scrolling (respect user preference) */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Disable all animations when user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), sans-serif;
+  color: var(--color-neutral-dark);
+  background: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Utility for scroll-snap carousel */
+.snap-x {
+  scroll-snap-type: x mandatory;
+}
+
+.snap-center {
+  scroll-snap-align: center;
+}
+
+/* Select element arrow for dark backgrounds */
+select option {
+  color: var(--color-neutral-dark);
+  background: #F8FBFA;
 }

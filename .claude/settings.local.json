@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(xargs kill:*)",
+      "Bash(sips:*)",
+      "Bash(convert --version)",
+      "Bash(magick --version)",
+      "Bash(python3:*)",
+      "WebSearch"
+    ]
+  }
+}
