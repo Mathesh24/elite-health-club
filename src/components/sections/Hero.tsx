@@ -28,7 +28,7 @@ export default function Hero() {
         preload="auto"
         className="absolute inset-0 h-full w-full object-cover object-center"
       >
-        <source src="/video1.mp4" type="video/mp4" />
+        <source src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/video1.mp4`} type="video/mp4" />
       </video>
 
       {/* Hero logo — top-left, same position as navbar logo; navbar is hidden during the hero so no overlap */}
@@ -46,7 +46,7 @@ export default function Hero() {
           width={724}
           height={585}
           className="h-24 w-auto [filter:drop-shadow(0_0_6px_rgba(255,255,255,0.95))_drop-shadow(0_0_18px_rgba(255,255,255,0.55))]"
-          priority
+          loading="eager"
         />
       </motion.a>
 
