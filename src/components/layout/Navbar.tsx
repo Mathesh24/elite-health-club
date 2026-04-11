@@ -43,7 +43,7 @@ export default function Navbar() {
           {/* Logo */}
           <a href="#" className="relative z-10 flex items-center gap-2">
             <Image
-              src="/logo1.png"
+              src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo1.png`}
               alt="Elite Health Club"
               width={724}
               height={585}

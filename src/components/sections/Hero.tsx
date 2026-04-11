@@ -41,7 +41,7 @@ export default function Hero() {
         aria-label="Elite Health Club home"
       >
         <Image
-          src="/logo1.png"
+          src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo1.png`}
           alt="Elite Health Club"
           width={724}
           height={585}

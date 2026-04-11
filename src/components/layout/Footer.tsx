@@ -16,7 +16,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Image
-              src="/logo1.png"
+              src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo1.png`}
               alt="Elite Health Club"
               width={160}
               height={40}

@@ -10,7 +10,8 @@
       "Bash(convert --version)",
       "Bash(magick --version)",
       "Bash(python3:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npx next:*)"
     ]
   }
 }
