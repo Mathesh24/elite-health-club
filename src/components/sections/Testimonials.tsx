@@ -6,6 +6,7 @@ import { testimonials } from "@/lib/constants";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 
+
 export default function Testimonials() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -28,8 +29,8 @@ export default function Testimonials() {
       className="bg-surface py-24"
       aria-label="Testimonials"
     >
-      <div className="mx-auto max-w-7xl px-6">
-        <AnimatedSection>
+    <div className="mx-auto max-w-7xl px-6">
+       <AnimatedSection>
           <SectionHeading
             title="What Our Members Say"
             subtitle="Real stories from real members who've made Elite their home."

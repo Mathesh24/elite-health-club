@@ -22,7 +22,7 @@ export default function Membership() {
         <AnimatedSection>
           <SectionHeading
             title="Choose Your Plan"
-            subtitle="Flexible membership options tailored to every lifestyle. Switch or upgrade anytime."
+            subtitle="Members only Club nestled in the serene surroundings ,it’s a lifestyle destination for families who value togetherness, leisure and exclusivity."
           />
         </AnimatedSection>
 

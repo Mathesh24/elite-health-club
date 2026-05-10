@@ -12,7 +12,7 @@ export const amenities = [
     name: "Swimming Pool",
     icon: "Waves" as const,
     description:
-      "Olympic-sized heated pool with dedicated lap lanes and a resort-style infinity edge overlooking landscaped gardens.",
+      "Mini Olympic Sized pool aimed at Low impact & Joint friendly exercises to meet longevity goals and reset your soul every day. Surrounded by soothing greenery and Clay Walls",
     stat: "25m Heated",
   },
   {
@@ -20,32 +20,36 @@ export const amenities = [
     name: "Gym & Fitness",
     icon: "Dumbbell" as const,
     description:
-      "State-of-the-art equipment across 12,000 sq ft, with dedicated zones for strength, cardio, and functional training.",
+      "State of the art executive Gym with 24 hr unrestricted access to members to add years to their life.",
     stat: "12,000 sq ft",
   },
   {
     id: "tennis",
-    name: "Tennis Courts",
-    icon: "CircleDot" as const,
+    name: " Multi Game Outdoor Court",
+    icon: "Activity" as const,
     description:
-      "Four professional-grade courts with floodlighting for evening play, plus coaching from certified pros.",
-    stat: "4 Courts",
+      "Asphalt based multipurpose joint friendly turf for Tennis , Basketball and Pickle ball. Flood lights for extended usage for professionals.",
   },
   {
     id: "badminton",
-    name: "Badminton",
-    icon: "Volleyball" as const,
+    name: "Luxury Stay",
+    icon: "Hotel" as const,
     description:
-      "Three international-standard indoor courts with sprung wooden flooring and tournament-grade lighting.",
-    stat: "3 Courts",
+      "Three international-standard indoor courts with sprung wooden flooring and tournament-grade lighting. -> Three suite rooms for members and their guests to service throughout the year , with prior booking.",
   },
   {
     id: "resort",
-    name: "Resort & Stay",
-    icon: "Hotel" as const,
+    name: "SAUNA",
+    icon: "Flame" as const,
     description:
-      "Luxury suites with spa access, farm-to-table dining, and curated wellness retreat packages for members and guests.",
-    stat: "24 Suites",
+      "Complete your daily ritual in our sauna sanctuary—a space where heat heals the body and the silence resets the soul. It’s the final, vital step in adding life to your years.",
+  },
+  {
+    id: "steambath",
+    name: "STEAM BATH",
+    icon: "Cloud" as const,
+    description:
+      "Vital screen free sanctuary designed to lower stress, support deep detoxification, and melt tension from gym and courts.",
   },
 ];
 
@@ -133,9 +137,9 @@ export const testimonials = [
 ];
 
 export const stats = [
-  { value: "15+", label: "Years of Excellence" },
+  /*{ value: "15+", label: "Years of Excellence" },
   { value: "5,000+", label: "Active Members" },
-  { value: "50+", label: "Classes Every Week" },
+  { value: "50+", label: "Classes Every Week" },*/
 ];
 
 export const galleryImages = [
@@ -194,8 +198,8 @@ export const galleryImages = [
 export const GALLERY_CATEGORIES = ["All", "Pool", "Gym", "Courts", "Resort"] as const;
 
 export const CONTACT_INFO = {
-  address: "42 Greenfield Avenue, Whitefield, Bangalore 560066",
-  phone: "+91 80 4567 8900",
-  email: "hello@elitehealthclub.in",
+  address: "Kandukur, Andhra Pradesh - 523 105",
+  phone: " +91 8187861777",
+  email: "elitehealthclubkdkr@gmail.com",
   hours: "Mon – Sat: 5:30 AM – 10:00 PM | Sun: 7:00 AM – 8:00 PM",
 };

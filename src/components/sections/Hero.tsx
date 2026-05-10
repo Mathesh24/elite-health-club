@@ -5,12 +5,13 @@ import { Waves, Dumbbell, Hotel, ChevronDown } from "lucide-react";
 import Image from "next/image";
 import Button from "@/components/ui/Button";
 
-const headline = ["Elevate", "Your", "Wellness", "Journey"];
+const headline =
+  "A Sanctuary Designed to Lower Stress, Support Deep Detoxification, Melt Tension, Add Life to Years, and Reset Your Soul";
 
 const highlights = [
-  { icon: Waves, label: "Infinity Pool", stat: "25 m heated" },
-  { icon: Dumbbell, label: "Premium Gym", stat: "12,000 sq ft" },
-  { icon: Hotel, label: "Luxury Suites", stat: "24 rooms" },
+  { icon: Waves, label: "MINI OLYMPIC SWIMMING POOL", stat: "62FT #25 FT" },
+  { icon: Dumbbell, label: "PREMIUM EXECUTIVE FUNCTIONAL GYM", stat: "12,000 sq ft" },
+  { icon: Hotel, label: "LUXURY SUITES", stat: "24 rooms" },
 ];
 
 export default function Hero() {
@@ -54,41 +55,40 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
 
       {/* Content */}
-      <div className="relative mx-auto w-full max-w-7xl px-6 py-32 lg:py-0">
-        <div className="max-w-2xl">
+      <div className="relative mx-auto w-full max-w-7xl px-6 py-28 sm:py-32 lg:-translate-y-8 lg:py-0">
+        <div className="max-w-4xl">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-accent"
+            className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-accent"
           >
             Where Elite Begins
           </motion.p>
 
-          <h1 className="font-hero text-5xl font-extralight leading-[1.15] tracking-wide text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.6)] sm:text-7xl lg:text-8xl">
-            {headline.map((word, i) => (
-              <motion.span
-                key={word}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.15 + i * 0.1 }}
-                className="mr-[0.25em] inline-block"
-              >
-                {word}
-              </motion.span>
-            ))}
-          </h1>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="max-w-4xl font-hero text-[2rem] font-extralight leading-[1.06] tracking-wide text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.6)] sm:text-5xl lg:text-[3.45rem] xl:text-[3.8rem]"
+          >
+            {headline}
+          </motion.h1>
 
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="mt-6 max-w-lg text-lg leading-relaxed text-white/75"
+            className="mt-5 max-w-2xl space-y-4 text-base leading-relaxed text-white/75 sm:text-lg"
           >
-            Discover a world-class wellness destination where cutting-edge
-            fitness meets resort-style luxury — designed for those who expect
-            nothing but the&nbsp;best.
-          </motion.p>
+            <p>
+              A world-class destination where premier amenities add life to your
+              years, and every visit serves to daily reset your soul. Discover a
+              destination built on excellence. Utilize our world-class amenities
+              to add life to your years and find the stillness needed to reset
+              your soul every single day.
+            </p>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -107,14 +107,14 @@ export default function Hero() {
       </div>
 
       {/* Floating amenity cards — bottom of hero */}
-      <div className="absolute inset-x-6 bottom-16 hidden gap-3 lg:flex lg:inset-x-0 lg:px-[calc((100vw-80rem)/2+1.5rem)]">
+      <div className="absolute bottom-16 left-6 hidden w-[48rem] max-w-[calc(100vw-3rem)] grid-cols-3 gap-3 lg:grid xl:left-[calc((100vw-80rem)/2+1.5rem)]">
         {highlights.map(({ icon: Icon, label, stat }, i) => (
           <motion.div
             key={label}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.8 + i * 0.12 }}
-            className="flex items-center gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md"
+            className="flex h-20 items-center gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md"
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/40 text-white">
               <Icon size={18} />

@@ -16,7 +16,7 @@ export default function Amenities() {
           />
         </AnimatedSection>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="grid auto-rows-fr gap-6 md:grid-cols-2 lg:grid-cols-3">
           {amenities.map((item, i) => {
             const Icon =
               (LucideIcons as unknown as Record<string, LucideIcons.LucideIcon>)[
@@ -24,18 +24,18 @@ export default function Amenities() {
               ] ?? LucideIcons.Star;
 
             return (
-              <AnimatedSection key={item.id} delay={i * 0.1}>
-                <div className="group rounded-2xl border border-transparent bg-light p-6 transition-all duration-200 hover:-translate-y-1 hover:border-brand hover:shadow-lg">
-                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
+              <AnimatedSection key={item.id} delay={i * 0.1} className="h-full">
+                <div className="group flex h-full min-h-72 flex-col rounded-2xl border border-transparent bg-light p-6 transition-all duration-200 hover:-translate-y-1 hover:border-brand hover:shadow-lg">
+                  <div className="mb-5 flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
                     <Icon size={28} />
                   </div>
-                  <h3 className="font-display text-lg font-bold text-neutral-dark">
+                  <h3 className="font-display text-lg font-bold leading-snug text-neutral-dark">
                     {item.name}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-neutral-dark/60">
+                  <p className="mt-3 text-sm leading-relaxed text-neutral-dark/60">
                     {item.description}
                   </p>
-                  <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-brand">
+                  <p className="mt-auto pt-5 text-xs font-semibold uppercase tracking-wider text-brand">
                     {item.stat}
                   </p>
                 </div>
