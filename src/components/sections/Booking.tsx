@@ -50,7 +50,7 @@ export default function Booking() {
   return (
     <section
       id="contact"
-      className="bg-light py-24"
+      className="bg-light py-12 sm:py-14"
       aria-label="Contact and booking"
     >
       <div className="mx-auto max-w-7xl px-6">
@@ -58,19 +58,20 @@ export default function Booking() {
           <SectionHeading
             title="Get in Touch"
             subtitle="Book a tour, ask a question, or start your membership journey today."
+            className="mb-8 sm:mb-10"
           />
         </AnimatedSection>
 
-        <div className="grid gap-12 lg:grid-cols-2">
+        <div className="grid gap-8 lg:grid-cols-2 lg:gap-10">
           {/* Left — contact info */}
           <AnimatedSection>
-            <div className="space-y-6">
+            <div className="space-y-4">
               {contactItems.map(({ icon: Icon, text }) => (
                 <div key={text} className="flex items-start gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand/20 text-brand">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#157070]/10 text-[#0E5F5A]">
                     <Icon size={20} />
                   </div>
-                  <p className="text-sm leading-relaxed text-neutral-dark/70">
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-neutral-dark/70">
                     {text}
                   </p>
                 </div>
@@ -78,12 +79,12 @@ export default function Booking() {
             </div>
 
             {/* Map placeholder */}
-            <div className="mt-10 overflow-hidden rounded-xl border border-neutral-dark/10">
+            <div className="mt-6 overflow-hidden rounded-xl border border-neutral-dark/10">
               <iframe
                 title="Elite Health Club location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.4!2d77.7!3d12.97!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTLCsDU4JzEyLjAiTiA3N8KwNDInMDAuMCJF!5e0!3m2!1sen!2sin!4v1"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3849.984787622548!2d79.92022967435838!3d15.21399886176646!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4b0d00630cc021%3A0x3f316db63e00ba43!2sELITE%20HEALTH%20CLUB!5e0!3m2!1sen!2sin!4v1778501951996!5m2!1sen!2sin"
                 width="100%"
-                height="220"
+                height="200"
                 style={{ border: 0 }}
                 allowFullScreen={false}
                 loading="lazy"
@@ -96,8 +97,8 @@ export default function Booking() {
           {/* Right — form */}
           <AnimatedSection delay={0.15}>
             {submitted ? (
-              <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl border border-brand/30 bg-brand/10 p-10 text-center">
-                <CheckCircle size={48} className="text-brand" />
+              <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl border border-brand/30 bg-brand/10 p-8 text-center">
+                <CheckCircle size={48} className="text-[#0E6A65]" />
                 <h3 className="font-display text-2xl font-bold text-neutral-dark">
                   Thank You!
                 </h3>
@@ -109,7 +110,7 @@ export default function Booking() {
             ) : (
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="space-y-5"
+                className="space-y-4"
                 noValidate
               >
                 {/* Name */}

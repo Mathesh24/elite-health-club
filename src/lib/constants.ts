@@ -35,7 +35,7 @@ export const amenities = [
     name: "Luxury Stay",
     icon: "Hotel" as const,
     description:
-      "Three international-standard indoor courts with sprung wooden flooring and tournament-grade lighting. -> Three suite rooms for members and their guests to service throughout the year , with prior booking.",
+      "Three suite rooms for members and their guests to service throughout the year , with prior booking.",
   },
   {
     id: "resort",
@@ -144,62 +144,78 @@ export const stats = [
 
 export const galleryImages = [
   {
-    src: "https://picsum.photos/seed/ehc-pool1/600/800",
+    src: "/SwimmingPool.png",
     alt: "Olympic-sized swimming pool with infinity edge",
     category: "Pool",
   },
   {
-    src: "https://picsum.photos/seed/ehc-gym1/600/600",
+    src: "/IndoorGym.png",
     alt: "Modern gym floor with state-of-the-art equipment",
     category: "Gym",
   },
   {
-    src: "https://picsum.photos/seed/ehc-court1/600/700",
+    src: "/ConferenceHall_1.png",
+    alt: "Modern conference hall with elegant interior",
+    category: "Hall",
+  },
+  {
+    src: "/MiniCafe1.png",
+    alt: "Cozy mini cafe area with seating and refreshments",
+    category: "Resort",
+  },
+  {
+    src: "/TennisCourt.png",
     alt: "Professional tennis court under floodlights",
     category: "Courts",
   },
   {
-    src: "https://picsum.photos/seed/ehc-resort1/600/800",
-    alt: "Luxury resort suite with garden view",
+    src: "/LivingArea.png",
+    alt: "Comfortable clubhouse living area",
     category: "Resort",
   },
   {
-    src: "https://picsum.photos/seed/ehc-gym2/600/600",
+    src: "/IndoorGym2.png",
     alt: "Free weights and functional training zone",
     category: "Gym",
   },
   {
-    src: "https://picsum.photos/seed/ehc-pool2/600/700",
-    alt: "Poolside lounge area with cabanas",
-    category: "Pool",
+    src: "/ConferenceHall_2.png",
+    alt: "Elegant meeting hall with conference seating",
+    category: "Hall",
   },
+
   {
-    src: "https://picsum.photos/seed/ehc-court2/600/600",
-    alt: "Indoor badminton court with sprung flooring",
-    category: "Courts",
-  },
-  {
-    src: "https://picsum.photos/seed/ehc-resort2/600/800",
+    src: "/SaunaSteamBath.png",
     alt: "Spa treatment room with ambient lighting",
     category: "Resort",
   },
   {
-    src: "https://picsum.photos/seed/ehc-gym3/600/700",
-    alt: "Cardio deck with panoramic windows",
-    category: "Gym",
+    src: "/DiningArea.png",
+    alt: "Elegant dining area with comfortable seating",
+    category: "Resort",
   },
   {
-    src: "https://picsum.photos/seed/ehc-pool3/600/600",
-    alt: "Heated indoor lap pool",
-    category: "Pool",
+    src: "/SaunaSteamBath3.png",
+    alt: "Modern steam bath with ambient lighting and wooden benches",
+    category: "Resort",
+  },
+  {
+    src: "/SaunaSteamBath2.png",
+    alt: "Elegant sauna steam room with wooden interiors",
+    category: "Resort",
+  },
+  {
+    src: "/MiniCafe2.png",
+    alt: "Cafe counter with snacks and beverages",
+    category: "Resort",
   },
 ];
 
-export const GALLERY_CATEGORIES = ["All", "Pool", "Gym", "Courts", "Resort"] as const;
+export const GALLERY_CATEGORIES = ["All", "Pool", "Gym", "Courts", "Resort", "Hall"] as const;
 
 export const CONTACT_INFO = {
   address: "Kandukur, Andhra Pradesh - 523 105",
   phone: " +91 8187861777",
   email: "elitehealthclubkdkr@gmail.com",
-  hours: "Mon – Sat: 5:30 AM – 10:00 PM | Sun: 7:00 AM – 8:00 PM",
+  hours:  "Mon – Sat\n5:30 AM – 10:00 PM\n\nSun\n7:00 AM – 8:00 PM",
 };

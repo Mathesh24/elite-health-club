@@ -20,18 +20,19 @@ export default function Gallery() {
   const closeLightbox = useCallback(() => setLightboxIdx(null), []);
 
   return (
-    <section id="gallery" className="bg-surface py-24" aria-label="Gallery">
+    <section id="gallery" className="bg-surface py-12 sm:py-14" aria-label="Gallery">
       <div className="mx-auto max-w-7xl px-6">
         <AnimatedSection>
           <SectionHeading
             title="A Glimpse Inside"
             subtitle="Explore our world-class facilities through the lens."
+            className="mb-7 sm:mb-9"
           />
         </AnimatedSection>
 
         {/* Filter pills */}
         <AnimatedSection>
-          <div className="mb-10 flex flex-wrap justify-center gap-2">
+          <div className="mb-6 flex flex-wrap justify-center gap-2 sm:mb-7">
             {GALLERY_CATEGORIES.map((cat) => (
               <button
                 key={cat}

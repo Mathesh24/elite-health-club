@@ -2,6 +2,7 @@
 
 import { Globe, Send, CirclePlay, ArrowUp } from "lucide-react";
 import { NAV_LINKS, CONTACT_INFO } from "@/lib/constants";
+import {FaInstagram, FaTwitter} from "react-icons/fa";
 import Image from "next/image";
 
 export default function Footer() {
@@ -55,7 +56,8 @@ export default function Footer() {
             </h4>
             <div className="flex gap-4">
               {[
-                { Icon: Globe, label: "Instagram" },
+                { Icon: FaInstagram, label: "Instagram" },
+                {Icon: FaTwitter, label: "Twitter" },
                 { Icon: Send, label: "Facebook" },
                 { Icon: CirclePlay, label: "YouTube" },
               ].map(({ Icon, label }) => (
@@ -69,7 +71,7 @@ export default function Footer() {
                 </a>
               ))}
             </div>
-            <p className="mt-6 text-sm">{CONTACT_INFO.hours}</p>
+            <p className="mt-6 whitespace-pre-line text-sm">{CONTACT_INFO.hours}</p>
           </div>
         </div>
 

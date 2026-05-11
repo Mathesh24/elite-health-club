@@ -1,137 +1,93 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check } from "lucide-react";
-import { plans } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { ArrowRight, Clock, Crown, ShieldCheck, Sparkles } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 import Button from "@/components/ui/Button";
 
-export default function Membership() {
-  const [annual, setAnnual] = useState(false);
+const membershipHighlights = [
+  { icon: Clock, label: "Early Bird Access" },
+  { icon: ShieldCheck, label: "Priority Access" },
+  { icon: Crown, label: "Limited Slots" },
+];
 
+export default function Membership() {
   return (
     <section
       id="plans"
-      className="bg-light py-24"
-      aria-label="Membership plans"
+      className="relative overflow-hidden bg-light py-12 sm:py-14"
+      aria-label="Exclusive membership invitation"
     >
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/35 to-transparent" />
+      <div className="pointer-events-none absolute left-1/2 top-14 h-56 w-56 -translate-x-[34rem] rounded-full bg-accent/10 blur-3xl" />
+      <div className="pointer-events-none absolute right-1/2 bottom-6 h-64 w-64 translate-x-[34rem] rounded-full bg-[#3C9088]/10 blur-3xl" />
+
+      <div className="relative mx-auto max-w-7xl px-6">
         <AnimatedSection>
           <SectionHeading
-            title="Choose Your Plan"
-            subtitle="Members only Club nestled in the serene surroundings ,it’s a lifestyle destination for families who value togetherness, leisure and exclusivity."
+            title="Join the Elite Community"
+            subtitle="Early memberships are opening for families who value wellness, leisure, privacy, and resort-style amenities in one refined destination."
+            className="mb-8 sm:mb-10"
           />
         </AnimatedSection>
 
-        {/* Toggle */}
         <AnimatedSection>
-          <div className="mb-14 flex items-center justify-center gap-3">
-            <span
-              className={cn(
-                "text-sm font-medium",
-                !annual ? "text-neutral-dark" : "text-neutral-dark/50"
-              )}
-            >
-              Monthly
-            </span>
-            <button
-              onClick={() => setAnnual((v) => !v)}
-              className={cn(
-                "relative h-7 w-12 rounded-full transition-colors",
-                annual ? "bg-brand" : "bg-neutral-dark/20"
-              )}
-              aria-label="Toggle annual billing"
-            >
-              <motion.div
-                layout
-                className="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-md"
-                style={{ left: annual ? "calc(100% - 1.625rem)" : "0.125rem" }}
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              />
-            </button>
-            <span
-              className={cn(
-                "text-sm font-medium",
-                annual ? "text-neutral-dark" : "text-neutral-dark/50"
-              )}
-            >
-              Annual{" "}
-              <span className="rounded-full bg-accent/20 px-2 py-0.5 text-xs font-semibold text-accent">
-                Save ~20%
-              </span>
-            </span>
+          <div className="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-white/70 bg-white/45 p-1 shadow-[0_24px_70px_rgba(14,30,26,0.12)] backdrop-blur-md">
+            <div className="relative rounded-[1.35rem] border border-white/70 bg-gradient-to-br from-white/90 via-surface/85 to-light/80 px-6 py-7 text-center sm:px-10 sm:py-8 lg:px-12">
+              <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-accent/50 to-transparent" />
+
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-accent/25 bg-white/70 text-[#0E5F5A] shadow-[0_12px_28px_rgba(14,30,26,0.08)]">
+                <Sparkles size={24} strokeWidth={1.9} />
+              </div>
+
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-accent">
+                Early Bird Access
+              </p>
+              <h3 className="mx-auto mt-3 max-w-2xl bg-gradient-to-r from-[#8A6A2F] via-accent to-[#B88A2F] bg-clip-text font-display text-3xl font-bold tracking-tight text-transparent sm:text-4xl">
+                Become an Early Member
+              </h3>
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-7 text-neutral-dark/65 sm:text-base">
+                Reserve priority access to a limited membership community built
+                around premium fitness, calm recovery, family leisure, and the
+                everyday luxury of a private wellness club.
+              </p>
+
+              <div className="mx-auto mt-6 grid max-w-2xl gap-3 sm:grid-cols-3">
+                {membershipHighlights.map(({ icon: Icon, label }, index) => (
+                  <motion.div
+                    key={label}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ duration: 0.4, delay: index * 0.08 }}
+                    className="flex items-center justify-center gap-2 rounded-full border border-brand/10 bg-white/45 px-4 py-2.5 text-sm font-medium text-neutral-dark/75"
+                  >
+                    <Icon size={16} className="text-[#0E6A65]" strokeWidth={1.9} />
+                    {label}
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Button
+                  href="#contact"
+                  variant="primary"
+                  className="group min-w-52 shadow-xl shadow-accent/20"
+                >
+                  Reserve Your Access
+                  <ArrowRight
+                    size={16}
+                    className="ml-2 transition-transform duration-200 group-hover:translate-x-1"
+                  />
+                </Button>
+                <span className="text-xs font-medium uppercase tracking-[0.22em] text-neutral-dark/45">
+                  Limited founding slots
+                </span>
+              </div>
+            </div>
           </div>
         </AnimatedSection>
-
-        {/* Cards */}
-        <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-3">
-          {plans.map((plan, i) => (
-            <AnimatedSection key={plan.name} delay={i * 0.12}>
-              <div
-                className={cn(
-                  "relative flex h-full flex-col rounded-2xl bg-white p-8 transition-shadow duration-200",
-                  plan.highlighted
-                    ? "scale-[1.03] border-2 border-brand shadow-xl"
-                    : "border border-neutral-dark/10 shadow-md hover:shadow-lg"
-                )}
-              >
-                {plan.highlighted && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-4 py-1 text-xs font-semibold text-white">
-                    Most Popular
-                  </span>
-                )}
-
-                <h3 className="font-display text-2xl font-bold text-neutral-dark">
-                  {plan.name}
-                </h3>
-
-                <div className="mt-4 flex items-baseline gap-1">
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={annual ? "a" : "m"}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                      className="font-display text-4xl font-bold text-brand"
-                    >
-                      ${annual ? plan.annualPrice : plan.monthlyPrice}
-                    </motion.span>
-                  </AnimatePresence>
-                  <span className="text-sm text-neutral-dark/50">
-                    /{annual ? "year" : "month"}
-                  </span>
-                </div>
-
-                <ul className="mt-6 flex-1 space-y-3">
-                  {plan.features.map((f) => (
-                    <li
-                      key={f}
-                      className="flex items-start gap-2 text-sm text-neutral-dark/70"
-                    >
-                      <Check
-                        size={16}
-                        className="mt-0.5 shrink-0 text-brand"
-                      />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  variant={plan.highlighted ? "primary" : "outline"}
-                  className="mt-8 w-full"
-                  href="#contact"
-                >
-                  Get Started
-                </Button>
-              </div>
-            </AnimatedSection>
-          ))}
-        </div>
       </div>
     </section>
   );

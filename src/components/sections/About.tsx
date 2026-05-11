@@ -6,16 +6,17 @@ import AnimatedSection from "@/components/ui/AnimatedSection";
 
 export default function About() {
   return (
-    <section id="about" className="bg-light py-24" aria-label="About us">
+    <section id="about" className="bg-light py-12 sm:py-14" aria-label="About us">
       <div className="mx-auto max-w-7xl px-6">
         <AnimatedSection>
           <SectionHeading
             title="About Elite Health Club"
             subtitle="More than a fitness centre — a lifestyle destination built on excellence."
+            className="mb-7 sm:mb-9"
           />
         </AnimatedSection>
 
-        <div className="grid items-center gap-12 lg:grid-cols-2">
+        <div className="grid items-center gap-7 lg:grid-cols-2 lg:gap-10">
           {/* Left — stats & text */}
           <AnimatedSection>
             <div className="grid grid-cols-3 gap-6">
@@ -29,7 +30,7 @@ export default function About() {
                 </div>
               ))}
             </div>
-            <div className="mt-10 space-y-4 text-neutral-dark/70">
+            <div className="mt-5 space-y-3 text-neutral-dark/70">
               <p>
                 Founded over fifteen years ago, Elite Health Club set out with a
                 simple vision: to create a wellness destination that rivals the
@@ -44,7 +45,7 @@ export default function About() {
             </div>
             <a
               href="#contact"
-              className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-brand transition-colors hover:text-brand/80"
+              className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-brand transition-colors hover:text-brand/80"
             >
               Learn Our Story &rarr;
             </a>
@@ -54,7 +55,7 @@ export default function About() {
           <AnimatedSection delay={0.2}>
             <div className="relative mx-auto max-w-md lg:mx-0 lg:ml-auto">
               <div className="rounded-2xl bg-brand p-1">
-                <div className="rounded-xl bg-white p-8">
+                <div className="rounded-xl bg-white p-6 sm:p-7">
                   <blockquote className="font-display text-xl italic leading-relaxed text-neutral-dark">
                     &ldquo;We don&apos;t just build bodies — we build a
                     community of people who hold each other to a higher

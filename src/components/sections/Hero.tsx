@@ -18,7 +18,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-svh items-center overflow-hidden bg-[#EEF4F1]"
+      className="relative flex min-h-svh flex-col overflow-hidden bg-[#EEF4F1]"
     >
       {/* Background video */}
       <video
@@ -46,7 +46,7 @@ export default function Hero() {
           alt="Elite Health Club"
           width={724}
           height={585}
-          className="h-24 w-auto [filter:drop-shadow(0_0_6px_rgba(255,255,255,0.95))_drop-shadow(0_0_18px_rgba(255,255,255,0.55))]"
+          className="h-20 w-auto [filter:drop-shadow(0_0_6px_rgba(255,255,255,0.95))_drop-shadow(0_0_18px_rgba(255,255,255,0.55))] sm:h-24"
           loading="eager"
         />
       </motion.a>
@@ -55,13 +55,13 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
 
       {/* Content */}
-      <div className="relative mx-auto w-full max-w-7xl px-6 py-28 sm:py-32 lg:-translate-y-8 lg:py-0">
-        <div className="max-w-4xl">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 items-center px-6 pb-10 pt-36 sm:pt-44 lg:pb-36 lg:pt-40 xl:pb-40">
+        <div className="max-w-3xl text-left">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-accent"
+            className="mb-3 max-w-full text-xs font-semibold uppercase tracking-[0.22em] text-accent sm:text-sm sm:tracking-[0.25em]"
           >
             Where Elite Begins
           </motion.p>
@@ -70,7 +70,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
-            className="max-w-4xl font-hero text-[2rem] font-extralight leading-[1.06] tracking-wide text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.6)] sm:text-5xl lg:text-[3.45rem] xl:text-[3.8rem]"
+            className="max-w-full font-hero text-[2rem] font-extralight leading-[1.1] tracking-wide text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.6)] sm:text-[2.7rem] md:text-[3rem] lg:text-[3.1rem] xl:text-[3.35rem]"
           >
             {headline}
           </motion.h1>
@@ -79,7 +79,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
-            className="mt-5 max-w-2xl space-y-4 text-base leading-relaxed text-white/75 sm:text-lg"
+            className="mt-5 max-w-2xl space-y-4 text-sm leading-relaxed text-white/75 sm:text-base lg:text-lg"
           >
             <p>
               A world-class destination where premier amenities add life to your
@@ -107,14 +107,14 @@ export default function Hero() {
       </div>
 
       {/* Floating amenity cards — bottom of hero */}
-      <div className="absolute bottom-16 left-6 hidden w-[48rem] max-w-[calc(100vw-3rem)] grid-cols-3 gap-3 lg:grid xl:left-[calc((100vw-80rem)/2+1.5rem)]">
+      <div className="relative z-10 mx-auto mb-16 grid w-full max-w-7xl grid-cols-1 gap-3 px-6 sm:grid-cols-3 lg:absolute lg:bottom-12 lg:left-1/2 lg:mb-0 lg:-translate-x-1/2">
         {highlights.map(({ icon: Icon, label, stat }, i) => (
           <motion.div
             key={label}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.8 + i * 0.12 }}
-            className="flex h-20 items-center gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md"
+            className="flex min-h-20 items-center gap-3 rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md"
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/40 text-white">
               <Icon size={18} />
@@ -133,7 +133,7 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/40 transition-colors hover:text-white"
+        className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 text-white/40 transition-colors hover:text-white lg:block"
         aria-label="Scroll down"
       >
         <ChevronDown size={28} className="animate-bounce" />
