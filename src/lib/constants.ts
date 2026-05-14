@@ -164,7 +164,7 @@ export const galleryImages = [
     category: "Resort",
   },
   {
-    src: "/TennisCourt.png",
+    src: "/tenniscourt1.png",
     alt: "Professional tennis court under floodlights",
     category: "Courts",
   },
@@ -209,6 +209,17 @@ export const galleryImages = [
     alt: "Cafe counter with snacks and beverages",
     category: "Resort",
   },
+   {
+    src: "/pool2.png",
+    alt: "Serene pool area with lounge chairs and greenery",
+    category: "Pool",
+  },
+  {
+    src: "/court.png",
+    alt: "Professional tennis court under floodlights",
+    category: "Courts",
+  },
+  
 ];
 
 export const GALLERY_CATEGORIES = ["All", "Pool", "Gym", "Courts", "Resort", "Hall"] as const;

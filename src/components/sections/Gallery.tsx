@@ -51,7 +51,7 @@ export default function Gallery() {
         </AnimatedSection>
 
         {/* Masonry grid */}
-        <div className="columns-2 gap-4 sm:columns-3 lg:columns-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((img, i) => (
             <AnimatedSection key={img.src} delay={i * 0.05}>
               <button
@@ -65,7 +65,7 @@ export default function Gallery() {
                   alt={img.alt}
                   width={600}
                   height={700}
-                  className="w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  className="h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-brand/60 opacity-0 transition-opacity duration-200 group-hover:opacity-100">

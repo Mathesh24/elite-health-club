@@ -17,7 +17,7 @@ export default function Amenities() {
           />
         </AnimatedSection>
 
-        <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        <div className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3">
           {amenities.map((item, i) => {
             const Icon =
               (LucideIcons as unknown as Record<string, LucideIcons.LucideIcon>)[
