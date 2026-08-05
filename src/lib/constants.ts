@@ -137,9 +137,9 @@ export const testimonials = [
 ];
 
 export const stats = [
-  /*{ value: "15+", label: "Years of Excellence" },
+  { value: "15+", label: "Years of Excellence" },
   { value: "5,000+", label: "Active Members" },
-  { value: "50+", label: "Classes Every Week" },*/
+  { value: "50+", label: "Classes Every Week" },
 ];
 
 export const galleryImages = [
