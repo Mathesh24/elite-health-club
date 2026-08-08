@@ -22,9 +22,14 @@ export default function Footer() {
               height={40}
               className="mb-4 h-9 w-auto"
             />
-            <p className="max-w-xs text-sm leading-relaxed">
+            <a
+              href={CONTACT_INFO.mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block max-w-xs text-sm leading-relaxed transition-colors hover:text-brand"
+            >
               {CONTACT_INFO.address}
-            </p>
+            </a>
             <p className="mt-2 text-sm">{CONTACT_INFO.phone}</p>
             <p className="text-sm">{CONTACT_INFO.email}</p>
           </div>

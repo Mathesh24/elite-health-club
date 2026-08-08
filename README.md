@@ -1,4 +1,18 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Elite Health Club website
+
+This is the public Elite Health Club website, built with Next.js and deployed as a static GitHub Pages site.
+
+## Membership payments
+
+Membership payments use a hosted Razorpay Payment Page. Bank details and gateway secrets must not be added to this repository or exposed in browser code.
+
+1. Complete Razorpay account activation and KYC using the club's settlement bank account.
+2. In live mode, create a fixed-amount Payment Page for `INR 150000` and publish it.
+3. In the GitHub repository, open **Settings → Secrets and variables → Actions → Variables**.
+4. Add a repository variable named `MEMBERSHIP_PAYMENT_URL` containing the published `https://rzp.io/...` or `https://pages.razorpay.com/...` URL.
+5. Run the Pages deployment workflow or push to `main`.
+
+The payment button is intentionally hidden when this variable is missing or is not an approved HTTPS Razorpay URL.
 
 ## Getting Started
 

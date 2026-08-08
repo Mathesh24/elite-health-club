@@ -8,6 +8,34 @@ import { cn } from "@/lib/utils";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 
+function getGalleryLayout(index: number, total: number) {
+  if (total <= 2) {
+    return "sm:col-span-1 lg:col-span-6";
+  }
+
+  if (total <= 8) {
+    if (index === 0) return "sm:col-span-2 lg:col-span-8 lg:row-span-2";
+    if (index === 1 || index === 2) return "lg:col-span-4";
+    if (index >= total - 2) return "lg:col-span-6";
+    return "lg:col-span-4";
+  }
+
+  const layout = [
+    "sm:col-span-2 lg:col-span-8 lg:row-span-2",
+    "lg:col-span-4",
+    "lg:col-span-4",
+    "lg:col-span-4",
+    "lg:col-span-4",
+    "lg:col-span-4",
+    "sm:col-span-2 lg:col-span-4 lg:row-span-2",
+    "sm:col-span-2 lg:col-span-8",
+    "lg:col-span-4",
+    "lg:col-span-4",
+  ];
+
+  return layout[index] ?? "lg:col-span-4";
+}
+
 export default function Gallery() {
   const [filter, setFilter] = useState<string>("All");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
@@ -26,12 +54,13 @@ export default function Gallery() {
           <SectionHeading
             title="A Glimpse Inside"
             subtitle="Explore our world-class facilities through the lens."
+            className="mb-8"
           />
         </AnimatedSection>
 
         {/* Filter pills */}
         <AnimatedSection>
-          <div className="mb-10 flex flex-wrap justify-center gap-2">
+          <div className="mb-8 flex flex-wrap justify-center gap-2 sm:mb-10">
             {GALLERY_CATEGORIES.map((cat) => (
               <button
                 key={cat}
@@ -49,26 +78,36 @@ export default function Gallery() {
           </div>
         </AnimatedSection>
 
-        {/* Masonry grid */}
-        <div className="columns-2 gap-4 sm:columns-3 lg:columns-4">
+        {/* Curated gallery grid */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-flow-dense lg:grid-cols-12 lg:auto-rows-[220px]">
           {filtered.map((img, i) => (
-            <AnimatedSection key={img.src} delay={i * 0.05}>
+            <AnimatedSection
+              key={img.src}
+              delay={i * 0.05}
+              className={cn(
+                "h-64 sm:h-72 lg:h-auto",
+                getGalleryLayout(i, filtered.length)
+              )}
+            >
               <button
-                onClick={() =>
-                  setLightboxIdx(galleryImages.indexOf(img))
-                }
-                className="group relative mb-4 block w-full overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-accent"
+                onClick={() => setLightboxIdx(galleryImages.indexOf(img))}
+                className="group relative block h-full w-full overflow-hidden rounded-2xl border border-white/70 bg-light shadow-[0_12px_35px_rgba(14,30,26,0.08)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                aria-label={`View ${img.alt}`}
               >
                 <Image
                   src={img.src}
                   alt={img.alt}
-                  width={600}
-                  height={700}
-                  className="w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  fill
+                  className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 67vw"
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-brand/60 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                  <ZoomIn size={32} className="text-white" />
+                <div className="absolute inset-0 flex items-end justify-between bg-gradient-to-t from-neutral-dark/75 via-neutral-dark/5 to-transparent p-5 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+                  <span className="text-left text-sm font-semibold tracking-wide text-white">
+                    {img.category}
+                  </span>
+                  <span className="rounded-full bg-white/15 p-2 text-white backdrop-blur-sm">
+                    <ZoomIn size={20} />
+                  </span>
                 </div>
               </button>
             </AnimatedSection>
@@ -94,8 +133,16 @@ export default function Gallery() {
           <Image
             src={galleryImages[lightboxIdx].src}
             alt={galleryImages[lightboxIdx].alt}
-            width={1200}
-            height={900}
+            width={
+              "width" in galleryImages[lightboxIdx]
+                ? galleryImages[lightboxIdx].width
+                : 1200
+            }
+            height={
+              "height" in galleryImages[lightboxIdx]
+                ? galleryImages[lightboxIdx].height
+                : 900
+            }
             className="max-h-[85vh] w-auto rounded-lg object-contain"
             onClick={(e) => e.stopPropagation()}
           />

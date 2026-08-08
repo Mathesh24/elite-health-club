@@ -8,6 +8,7 @@ type Variant = "primary" | "ghost" | "outline";
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   href?: string;
+  external?: boolean;
 }
 
 const variantStyles: Record<Variant, string> = {
@@ -23,6 +24,7 @@ export default function Button({
   variant = "primary",
   className,
   href,
+  external = false,
   children,
   ...props
 }: ButtonProps) {
@@ -34,7 +36,12 @@ export default function Button({
 
   if (href) {
     return (
-      <a href={href} className={classes}>
+      <a
+        href={href}
+        className={classes}
+        target={external ? "_blank" : undefined}
+        rel={external ? "noopener noreferrer" : undefined}
+      >
         {children}
       </a>
     );

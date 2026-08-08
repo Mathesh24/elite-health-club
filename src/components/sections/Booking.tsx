@@ -22,7 +22,12 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 const contactItems = [
-  { icon: MapPin, text: CONTACT_INFO.address },
+  {
+    icon: MapPin,
+    text: CONTACT_INFO.address,
+    href: CONTACT_INFO.mapsUrl,
+    label: "Open Elite Health Club location in Google Maps",
+  },
   { icon: Phone, text: CONTACT_INFO.phone },
   { icon: Mail, text: CONTACT_INFO.email },
   { icon: Clock, text: CONTACT_INFO.hours },
@@ -65,31 +70,52 @@ export default function Booking() {
           {/* Left — contact info */}
           <AnimatedSection>
             <div className="space-y-6">
-              {contactItems.map(({ icon: Icon, text }) => (
+              {contactItems.map(({ icon: Icon, text, href, label }) => (
                 <div key={text} className="flex items-start gap-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand/20 text-brand">
                     <Icon size={20} />
                   </div>
-                  <p className="text-sm leading-relaxed text-neutral-dark/70">
-                    {text}
-                  </p>
+                  {href ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="text-sm leading-relaxed text-neutral-dark/70 underline decoration-neutral-dark/20 underline-offset-4 transition-colors hover:text-brand"
+                    >
+                      {text}
+                    </a>
+                  ) : (
+                    <p className="text-sm leading-relaxed text-neutral-dark/70">
+                      {text}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
 
-            {/* Map placeholder */}
+            {/* Club location */}
             <div className="mt-10 overflow-hidden rounded-xl border border-neutral-dark/10">
               <iframe
                 title="Elite Health Club location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.4!2d77.7!3d12.97!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTLCsDU4JzEyLjAiTiA3N8KwNDInMDAuMCJF!5e0!3m2!1sen!2sin!4v1"
+                src={CONTACT_INFO.mapsEmbedUrl}
                 width="100%"
                 height="220"
                 style={{ border: 0 }}
                 allowFullScreen={false}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                className="opacity-80 grayscale"
+                className="opacity-90"
               />
+              <a
+                href={CONTACT_INFO.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 bg-white px-4 py-3 text-sm font-semibold text-brand transition-colors hover:bg-brand/10"
+              >
+                <MapPin size={17} aria-hidden="true" />
+                Open in Google Maps
+              </a>
             </div>
           </AnimatedSection>
 
