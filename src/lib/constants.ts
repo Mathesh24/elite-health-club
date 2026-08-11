@@ -11,7 +11,7 @@ export const amenities = [
     id: "pool",
     name: "Swimming Pool",
     icon: "Waves" as const,
-    image: "/SwimmingPool.png",
+    image: "/SwimmingPool.webp",
     description:
       "Mini Olympic Sized pool aimed at Low impact & Joint friendly exercises to meet longevity goals and reset your soul every day. Surrounded by soothing greenery and Clay Walls",
     stat: "25m Heated",
@@ -20,7 +20,7 @@ export const amenities = [
     id: "gym",
     name: "Gym & Fitness",
     icon: "Dumbbell" as const,
-    image: "/IndoorGym.png",
+    image: "/IndoorGym.webp",
     description:
       "State of the art executive Gym with 24 hr unrestricted access to members to add years to their life.",
     stat: "12,000 sq ft",
@@ -29,7 +29,7 @@ export const amenities = [
     id: "tennis",
     name: "Multi Game Outdoor Court",
     icon: "Activity" as const,
-    image: "/tenniscourt1.png",
+    image: "/tenniscourt1.webp",
     description:
       "Asphalt based multipurpose joint friendly turf for Tennis, Basketball and Pickle ball. Flood lights for extended usage for professionals.",
   },
@@ -37,7 +37,7 @@ export const amenities = [
     id: "badminton",
     name: "Luxury Stay",
     icon: "Hotel" as const,
-    image: "/LivingArea.png",
+    image: "/LivingArea.webp",
     description:
       "Three suite rooms for members and their guests to service throughout the year, with prior booking.",
   },
@@ -45,7 +45,7 @@ export const amenities = [
     id: "resort",
     name: "Sauna",
     icon: "Flame" as const,
-    image: "/SaunaSteamBath2.png",
+    image: "/SaunaSteamBath2.webp",
     description:
       "Complete your daily ritual in our sauna sanctuary—a space where heat heals the body and the silence resets the soul. It’s the final, vital step in adding life to your years.",
   },
@@ -53,7 +53,7 @@ export const amenities = [
     id: "steambath",
     name: "Steam Bath",
     icon: "Cloud" as const,
-    image: "/SaunaSteamBath3.png",
+    image: "/SaunaSteamBath3.webp",
     description:
       "Vital screen free sanctuary designed to lower stress, support deep detoxification, and melt tension from gym and courts.",
   },
@@ -107,120 +107,50 @@ const publicBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 const homepageContentGalleryImages = [
   {
-    src: `${publicBasePath}/SwimmingPool.png`,
-    alt: "Olympic-sized swimming pool with infinity edge",
-    category: "Pool",
-    width: 842,
-    height: 1264,
-  },
-  {
-    src: `${publicBasePath}/IndoorGym.png`,
-    alt: "Modern gym floor with state-of-the-art equipment",
-    category: "Gym",
-    width: 1195,
-    height: 896,
-  },
-  {
-    src: `${publicBasePath}/ConferenceHall_1.png`,
-    alt: "Modern conference hall with elegant interior",
-    category: "Hall",
-    width: 1195,
-    height: 896,
-  },
-  {
-    src: `${publicBasePath}/MiniCafe1.png`,
-    alt: "Cozy mini cafe area with seating and refreshments",
-    category: "Resort",
-    width: 1024,
-    height: 1024,
-  },
-  {
-    src: `${publicBasePath}/tenniscourt1.png`,
-    alt: "Professional tennis court under floodlights",
-    category: "Courts",
-    width: 1448,
-    height: 1086,
-  },
-  {
-    src: `${publicBasePath}/LivingArea.png`,
-    alt: "Comfortable clubhouse living area",
-    category: "Resort",
-    width: 1195,
-    height: 896,
-  },
-  {
-    src: `${publicBasePath}/IndoorGym2.png`,
-    alt: "Free weights and functional training zone",
-    category: "Gym",
-    width: 1195,
-    height: 896,
-  },
-  {
-    src: `${publicBasePath}/ConferenceHall_2.png`,
-    alt: "Elegant meeting hall with conference seating",
-    category: "Hall",
-    width: 1254,
-    height: 1254,
-  },
-  {
-    src: `${publicBasePath}/SaunaSteamBath.png`,
-    alt: "Spa treatment room with ambient lighting",
-    category: "Resort",
-    width: 1024,
-    height: 1024,
-  },
-  {
-    src: `${publicBasePath}/DiningArea.png`,
-    alt: "Elegant dining area with comfortable seating",
-    category: "Resort",
-    width: 1024,
-    height: 1024,
-  },
-  {
-    src: `${publicBasePath}/SaunaSteamBath3.png`,
-    alt: "Modern steam bath with ambient lighting and wooden benches",
-    category: "Resort",
-    width: 1024,
-    height: 1024,
-  },
-  {
-    src: `${publicBasePath}/SaunaSteamBath2.png`,
-    alt: "Elegant sauna steam room with wooden interiors",
-    category: "Resort",
-    width: 1024,
-    height: 1024,
-  },
-  {
-    src: `${publicBasePath}/MiniCafe2.png`,
-    alt: "Cafe counter with snacks and beverages",
-    category: "Resort",
-    width: 1024,
-    height: 1024,
-  },
-  {
-    src: `${publicBasePath}/pool2.png`,
-    alt: "Serene pool area with lounge chairs and greenery",
-    category: "Pool",
-    width: 1195,
-    height: 896,
-  },
-  {
-    src: `${publicBasePath}/court.png`,
-    alt: "Professional tennis court under floodlights",
-    category: "Courts",
-    width: 1122,
-    height: 1402,
-  },
-];
-
-const currentGalleryImages = [
-  {
     src: `${publicBasePath}/elite-pool-daylight-wide.webp`,
     alt: "Elite Health Club swimming pool filled with clear water in natural daylight",
     category: "Pool",
     width: 1448,
     height: 1086,
   },
+  {
+    src: `${publicBasePath}/gallery-gym-clean.webp`,
+    alt: "Executive gym with free weights and cardio equipment",
+    category: "Gym",
+    width: 1440,
+    height: 960,
+  },
+  {
+    src: `${publicBasePath}/gallery-courts-clean.webp`,
+    alt: "Multipurpose outdoor sports court surrounded by greenery",
+    category: "Courts",
+    width: 1440,
+    height: 960,
+  },
+  {
+    src: `${publicBasePath}/gallery-resort-clean.webp`,
+    alt: "Private sauna and steam bath wellness sanctuary",
+    category: "Resort",
+    width: 1440,
+    height: 1080,
+  },
+  {
+    src: `${publicBasePath}/gallery-hall-clean.webp`,
+    alt: "Private conference hall with modern seating and warm wood finishes",
+    category: "Hall",
+    width: 1440,
+    height: 1080,
+  },
+  {
+    src: `${publicBasePath}/gallery-14.webp`,
+    alt: "Clean landscaped entrance to the Elite Health Club pool area",
+    category: "Club Grounds",
+    width: 1448,
+    height: 1086,
+  },
+];
+
+const currentGalleryImages = [
   {
     src: `${publicBasePath}/elite-pool-daylight-overview.webp`,
     alt: "Elevated daylight view of the full Elite Health Club swimming pool",
@@ -241,13 +171,6 @@ const currentGalleryImages = [
     category: "Pool",
     width: 960,
     height: 1280,
-  },
-  {
-    src: `${publicBasePath}/gallery-14.webp`,
-    alt: "Clean landscaped entrance to the Elite Health Club pool area",
-    category: "Club Grounds",
-    width: 1448,
-    height: 1086,
   },
   {
     src: `${publicBasePath}/gallery-9.webp`,
