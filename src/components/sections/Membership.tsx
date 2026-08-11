@@ -1,6 +1,7 @@
-import { Check, Clock3, Crown, Ticket, User } from "lucide-react";
+import { Check, Clock3, Crown, FlaskConical, Ticket, User } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/Button";
+import MembershipPaymentButton from "@/components/payments/MembershipPaymentButton";
 
 const individualBenefits = [
   "Dedicated app and web platform for seamless access to club amenities",
@@ -80,6 +81,15 @@ export default function Membership() {
           className="!mb-10 sm:!mb-14"
         />
 
+        <div className="mx-auto mb-8 flex max-w-3xl items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-4 text-sm leading-relaxed text-amber-900">
+          <FlaskConical size={20} className="mt-0.5 shrink-0" aria-hidden="true" />
+          <p>
+            <span className="font-semibold">Payment testing is enabled.</span>{" "}
+            Razorpay Test Mode uses simulated transactions. No real money is
+            charged and a test payment does not activate a real membership.
+          </p>
+        </div>
+
         <div className="mx-auto grid max-w-6xl items-stretch gap-6 lg:grid-cols-2">
           <article className="flex h-full flex-col rounded-3xl border border-neutral-dark/10 bg-white p-6 shadow-md sm:p-8">
             <div className="mb-5 flex items-start justify-between gap-4">
@@ -128,9 +138,7 @@ export default function Membership() {
               <BenefitList benefits={individualBenefits} />
             </div>
 
-            <Button href="#contact" variant="outline" className="mt-7 w-full">
-              Enquire About Individual Membership
-            </Button>
+            <MembershipPaymentButton planId="individual" />
           </article>
 
           <article className="relative flex h-full flex-col overflow-hidden rounded-3xl bg-neutral-dark p-6 text-white shadow-2xl sm:p-8">
@@ -181,9 +189,7 @@ export default function Membership() {
                 <BenefitList benefits={familyBenefits} featured />
               </div>
 
-              <Button href="#contact" variant="primary" className="mt-7 w-full">
-                Enquire About Family Membership
-              </Button>
+              <MembershipPaymentButton planId="family" featured />
             </div>
           </article>
         </div>
