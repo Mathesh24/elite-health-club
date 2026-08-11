@@ -302,11 +302,12 @@ export const GALLERY_CATEGORIES = [
 ] as const;
 
 export const CONTACT_INFO = {
-  address: "6W7F+H4V, Oguru, Andhra Pradesh",
+  address:
+    "1-1, Kakumanivaripalem, Kandukur Rural, Kandukur, SPSR Nellore, Andhra Pradesh - 523105",
   mapsUrl: "https://maps.app.goo.gl/RARUCYvAzuCu4pLfA?g_st=aw",
   mapsEmbedUrl:
     "https://www.google.com/maps?q=15.213987,79.922782&z=16&output=embed",
-  phone: "+91 80 4567 8900",
+  phone: "+91 81878 61777",
   email: "Elitehealthclubkdkr@gmail.com",
   hours: "Mon – Sat: 5:30 AM – 10:00 PM | Sun: 7:00 AM – 8:00 PM",
 };

@@ -8,34 +8,6 @@ import { cn } from "@/lib/utils";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
 
-function getGalleryLayout(index: number, total: number) {
-  if (total <= 2) {
-    return "sm:col-span-1 lg:col-span-6";
-  }
-
-  if (total <= 8) {
-    if (index === 0) return "sm:col-span-2 lg:col-span-8 lg:row-span-2";
-    if (index === 1 || index === 2) return "lg:col-span-4";
-    if (index >= total - 2) return "lg:col-span-6";
-    return "lg:col-span-4";
-  }
-
-  const layout = [
-    "sm:col-span-2 lg:col-span-8 lg:row-span-2",
-    "lg:col-span-4",
-    "lg:col-span-4",
-    "lg:col-span-4",
-    "lg:col-span-4",
-    "lg:col-span-4",
-    "sm:col-span-2 lg:col-span-4 lg:row-span-2",
-    "sm:col-span-2 lg:col-span-8",
-    "lg:col-span-4",
-    "lg:col-span-4",
-  ];
-
-  return layout[index] ?? "lg:col-span-4";
-}
-
 export default function Gallery() {
   const [filter, setFilter] = useState<string>("All");
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
@@ -78,16 +50,13 @@ export default function Gallery() {
           </div>
         </AnimatedSection>
 
-        {/* Curated gallery grid */}
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-flow-dense lg:grid-cols-12 lg:auto-rows-[220px]">
+        {/* Uniform gallery grid */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((img, i) => (
             <AnimatedSection
               key={img.src}
               delay={i * 0.05}
-              className={cn(
-                "h-64 sm:h-72 lg:h-auto",
-                getGalleryLayout(i, filtered.length)
-              )}
+              className="h-64 sm:h-72"
             >
               <button
                 onClick={() => setLightboxIdx(galleryImages.indexOf(img))}
