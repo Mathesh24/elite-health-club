@@ -16,7 +16,7 @@ export default function Amenities() {
           />
         </AnimatedSection>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {amenities.map((item, i) => {
             const Icon =
               (LucideIcons as unknown as Record<string, LucideIcons.LucideIcon>)[
@@ -25,7 +25,7 @@ export default function Amenities() {
 
             return (
               <AnimatedSection key={item.id} delay={i * 0.1}>
-                <div className="group rounded-2xl border border-transparent bg-light p-6 transition-all duration-200 hover:-translate-y-1 hover:border-brand hover:shadow-lg">
+                <div className="group h-full rounded-2xl border border-transparent bg-light p-6 transition-all duration-200 hover:-translate-y-1 hover:border-brand hover:shadow-lg">
                   <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-white">
                     <Icon size={28} />
                   </div>
@@ -35,9 +35,11 @@ export default function Amenities() {
                   <p className="mt-2 text-sm leading-relaxed text-neutral-dark/60">
                     {item.description}
                   </p>
-                  <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-brand">
-                    {item.stat}
-                  </p>
+                  {item.stat && (
+                    <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-brand">
+                      {item.stat}
+                    </p>
+                  )}
                 </div>
               </AnimatedSection>
             );

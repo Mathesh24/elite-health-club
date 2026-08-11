@@ -2,17 +2,20 @@
 
 This is the public Elite Health Club website, built with Next.js and deployed as a static GitHub Pages site.
 
-## Membership payments
+## Membership enquiries
 
-Membership payments use a hosted Razorpay Payment Page. Bank details and gateway secrets must not be added to this repository or exposed in browser code.
+The public website does not collect membership payments. Membership and guest-access calls to action direct visitors to the contact form so the club team can confirm current terms and follow up on each enquiry. Submitted enquiries are stored in Google Sheets.
 
-1. Complete Razorpay account activation and KYC using the club's settlement bank account.
-2. In live mode, create a fixed-amount Payment Page for `INR 150000` and publish it.
-3. In the GitHub repository, open **Settings → Secrets and variables → Actions → Variables**.
-4. Add a repository variable named `MEMBERSHIP_PAYMENT_URL` containing the published `https://rzp.io/...` or `https://pages.razorpay.com/...` URL.
-5. Run the Pages deployment workflow or push to `main`.
+### Connect the enquiry form to Google Sheets
 
-The payment button is intentionally hidden when this variable is missing or is not an approved HTTPS Razorpay URL.
+1. Create a Google Sheet and open **Extensions → Apps Script**.
+2. Replace the editor contents with `google-apps-script/Code.gs` from this repository and save it.
+3. Select **Deploy → New deployment → Web app**. Run it as yourself and allow access to anyone.
+4. Copy the deployed web-app URL.
+5. For local development, copy `.env.example` to `.env.local` and add the URL as `NEXT_PUBLIC_GOOGLE_SHEETS_WEB_APP_URL`.
+6. For GitHub Pages, add the URL as the repository Actions secret `GOOGLE_SHEETS_WEB_APP_URL`.
+
+The script creates an `Enquiries` tab automatically and records the submission time, name, email, phone, enquiry type, message and source page.
 
 ## Getting Started
 

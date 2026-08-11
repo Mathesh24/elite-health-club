@@ -17,6 +17,7 @@ const schema = z.object({
   phone: z.string().min(7, "Please enter a valid phone number"),
   interest: z.enum(["Tour", "Membership", "Event", "Other"]),
   message: z.string().optional(),
+  website: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -35,18 +36,59 @@ const contactItems = [
 
 export default function Booking() {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { interest: "Tour" },
   });
 
-  const onSubmit = () => {
-    setSubmitted(true);
+  const onSubmit = async (values: FormValues) => {
+    if (values.website) {
+      setSubmitted(true);
+      return;
+    }
+
+    const endpoint = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_WEB_APP_URL?.trim();
+
+    if (!endpoint) {
+      setSubmitError(
+        "Online enquiries are temporarily unavailable. Please call or email us instead."
+      );
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      await fetch(endpoint, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          ...values,
+          message: values.message?.trim() ?? "",
+          submittedAt: new Date().toISOString(),
+          source: window.location.href,
+        }),
+      });
+
+      reset({ interest: "Tour" });
+      setSubmitted(true);
+    } catch {
+      setSubmitError(
+        "We couldn’t send your enquiry. Please try again or contact us directly."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const inputClass =
@@ -135,13 +177,29 @@ export default function Booking() {
             ) : (
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="space-y-5"
+                className="relative space-y-5"
                 noValidate
               >
+                <div
+                  className="pointer-events-none absolute -left-[9999px]"
+                  aria-hidden="true"
+                >
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    {...register("website")}
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+
                 {/* Name */}
                 <div>
                   <input
                     {...register("name")}
+                    aria-label="Full name"
+                    autoComplete="name"
                     placeholder="Full Name"
                     className={cn(inputClass, errors.name && "border-red-400")}
                   />
@@ -157,6 +215,8 @@ export default function Booking() {
                   <input
                     {...register("email")}
                     type="email"
+                    aria-label="Email address"
+                    autoComplete="email"
                     placeholder="Email Address"
                     className={cn(inputClass, errors.email && "border-red-400")}
                   />
@@ -172,6 +232,8 @@ export default function Booking() {
                   <input
                     {...register("phone")}
                     type="tel"
+                    aria-label="Phone number"
+                    autoComplete="tel"
                     placeholder="Phone Number"
                     className={cn(inputClass, errors.phone && "border-red-400")}
                   />
@@ -186,6 +248,7 @@ export default function Booking() {
                 <div>
                   <select
                     {...register("interest")}
+                    aria-label="Enquiry type"
                     className={cn(inputClass, "appearance-none")}
                   >
                     <option value="Tour">Book a Tour</option>
@@ -199,14 +262,29 @@ export default function Booking() {
                 <div>
                   <textarea
                     {...register("message")}
+                    aria-label="Your message"
                     rows={4}
                     placeholder="Your Message (optional)"
                     className={inputClass}
                   />
                 </div>
 
-                <Button type="submit" variant="primary" className="w-full">
-                  Send Enquiry
+                {submitError && (
+                  <p
+                    role="alert"
+                    className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700"
+                  >
+                    {submitError}
+                  </p>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="w-full disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Sending…" : "Send Enquiry"}
                 </Button>
               </form>
             )}

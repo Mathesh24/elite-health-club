@@ -1,7 +1,7 @@
 export const NAV_LINKS = [
   { label: "Amenities", href: "#amenities" },
-  { label: "About", href: "#about" },
   { label: "Gallery", href: "#gallery" },
+  { label: "About", href: "#about" },
   { label: "Membership", href: "#plans" },
   { label: "Contact", href: "#contact" },
 ] as const;
@@ -11,41 +11,51 @@ export const amenities = [
     id: "pool",
     name: "Swimming Pool",
     icon: "Waves" as const,
+    image: "/SwimmingPool.png",
     description:
-      "Olympic-sized heated pool with dedicated lap lanes and a resort-style infinity edge overlooking landscaped gardens.",
+      "Mini Olympic Sized pool aimed at Low impact & Joint friendly exercises to meet longevity goals and reset your soul every day. Surrounded by soothing greenery and Clay Walls",
     stat: "25m Heated",
   },
   {
     id: "gym",
     name: "Gym & Fitness",
     icon: "Dumbbell" as const,
+    image: "/IndoorGym.png",
     description:
-      "State-of-the-art equipment across 12,000 sq ft, with dedicated zones for strength, cardio, and functional training.",
+      "State of the art executive Gym with 24 hr unrestricted access to members to add years to their life.",
     stat: "12,000 sq ft",
   },
   {
     id: "tennis",
-    name: "Tennis Courts",
-    icon: "CircleDot" as const,
+    name: "Multi Game Outdoor Court",
+    icon: "Activity" as const,
+    image: "/tenniscourt1.png",
     description:
-      "Four professional-grade courts with floodlighting for evening play, plus coaching from certified pros.",
-    stat: "4 Courts",
+      "Asphalt based multipurpose joint friendly turf for Tennis, Basketball and Pickle ball. Flood lights for extended usage for professionals.",
   },
   {
     id: "badminton",
-    name: "Badminton",
-    icon: "Volleyball" as const,
+    name: "Luxury Stay",
+    icon: "Hotel" as const,
+    image: "/LivingArea.png",
     description:
-      "Three international-standard indoor courts with sprung wooden flooring and tournament-grade lighting.",
-    stat: "3 Courts",
+      "Three suite rooms for members and their guests to service throughout the year, with prior booking.",
   },
   {
     id: "resort",
-    name: "Resort & Stay",
-    icon: "Hotel" as const,
+    name: "Sauna",
+    icon: "Flame" as const,
+    image: "/SaunaSteamBath2.png",
     description:
-      "Luxury suites with spa access, farm-to-table dining, and curated wellness retreat packages for members and guests.",
-    stat: "24 Suites",
+      "Complete your daily ritual in our sauna sanctuary—a space where heat heals the body and the silence resets the soul. It’s the final, vital step in adding life to your years.",
+  },
+  {
+    id: "steambath",
+    name: "Steam Bath",
+    icon: "Cloud" as const,
+    image: "/SaunaSteamBath3.png",
+    description:
+      "Vital screen free sanctuary designed to lower stress, support deep detoxification, and melt tension from gym and courts.",
   },
 ];
 
@@ -95,7 +105,115 @@ export const stats = [
 
 const publicBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
-export const galleryImages = [
+const homepageContentGalleryImages = [
+  {
+    src: `${publicBasePath}/SwimmingPool.png`,
+    alt: "Olympic-sized swimming pool with infinity edge",
+    category: "Pool",
+    width: 842,
+    height: 1264,
+  },
+  {
+    src: `${publicBasePath}/IndoorGym.png`,
+    alt: "Modern gym floor with state-of-the-art equipment",
+    category: "Gym",
+    width: 1195,
+    height: 896,
+  },
+  {
+    src: `${publicBasePath}/ConferenceHall_1.png`,
+    alt: "Modern conference hall with elegant interior",
+    category: "Hall",
+    width: 1195,
+    height: 896,
+  },
+  {
+    src: `${publicBasePath}/MiniCafe1.png`,
+    alt: "Cozy mini cafe area with seating and refreshments",
+    category: "Resort",
+    width: 1024,
+    height: 1024,
+  },
+  {
+    src: `${publicBasePath}/tenniscourt1.png`,
+    alt: "Professional tennis court under floodlights",
+    category: "Courts",
+    width: 1448,
+    height: 1086,
+  },
+  {
+    src: `${publicBasePath}/LivingArea.png`,
+    alt: "Comfortable clubhouse living area",
+    category: "Resort",
+    width: 1195,
+    height: 896,
+  },
+  {
+    src: `${publicBasePath}/IndoorGym2.png`,
+    alt: "Free weights and functional training zone",
+    category: "Gym",
+    width: 1195,
+    height: 896,
+  },
+  {
+    src: `${publicBasePath}/ConferenceHall_2.png`,
+    alt: "Elegant meeting hall with conference seating",
+    category: "Hall",
+    width: 1254,
+    height: 1254,
+  },
+  {
+    src: `${publicBasePath}/SaunaSteamBath.png`,
+    alt: "Spa treatment room with ambient lighting",
+    category: "Resort",
+    width: 1024,
+    height: 1024,
+  },
+  {
+    src: `${publicBasePath}/DiningArea.png`,
+    alt: "Elegant dining area with comfortable seating",
+    category: "Resort",
+    width: 1024,
+    height: 1024,
+  },
+  {
+    src: `${publicBasePath}/SaunaSteamBath3.png`,
+    alt: "Modern steam bath with ambient lighting and wooden benches",
+    category: "Resort",
+    width: 1024,
+    height: 1024,
+  },
+  {
+    src: `${publicBasePath}/SaunaSteamBath2.png`,
+    alt: "Elegant sauna steam room with wooden interiors",
+    category: "Resort",
+    width: 1024,
+    height: 1024,
+  },
+  {
+    src: `${publicBasePath}/MiniCafe2.png`,
+    alt: "Cafe counter with snacks and beverages",
+    category: "Resort",
+    width: 1024,
+    height: 1024,
+  },
+  {
+    src: `${publicBasePath}/pool2.png`,
+    alt: "Serene pool area with lounge chairs and greenery",
+    category: "Pool",
+    width: 1195,
+    height: 896,
+  },
+  {
+    src: `${publicBasePath}/court.png`,
+    alt: "Professional tennis court under floodlights",
+    category: "Courts",
+    width: 1122,
+    height: 1402,
+  },
+];
+
+const currentGalleryImages = [
   {
     src: `${publicBasePath}/elite-pool-daylight-wide.webp`,
     alt: "Elite Health Club swimming pool filled with clear water in natural daylight",
@@ -168,18 +286,28 @@ export const galleryImages = [
   },
 ];
 
+export const galleryImages = [
+  ...homepageContentGalleryImages,
+  ...currentGalleryImages,
+];
+
 export const GALLERY_CATEGORIES = [
   "All",
   "Pool",
+  "Gym",
+  "Courts",
+  "Resort",
+  "Hall",
   "Club Grounds",
 ] as const;
 
 export const CONTACT_INFO = {
-  address: "6W7F+H4V, Oguru, Andhra Pradesh",
+  address:
+    "1-1, Kakumanivaripalem, Kandukur Rural, Kandukur, SPSR Nellore, Andhra Pradesh - 523105",
   mapsUrl: "https://maps.app.goo.gl/RARUCYvAzuCu4pLfA?g_st=aw",
   mapsEmbedUrl:
     "https://www.google.com/maps?q=15.213987,79.922782&z=16&output=embed",
-  phone: "+91 80 4567 8900",
-  email: "hello@elitehealthclub.in",
+  phone: "+91 81878 61777",
+  email: "Elitehealthclubkdkr@gmail.com",
   hours: "Mon – Sat: 5:30 AM – 10:00 PM | Sun: 7:00 AM – 8:00 PM",
 };
