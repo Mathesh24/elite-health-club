@@ -1,0 +1,23 @@
+[build]
+  command = "npm run build"
+  # `output: "export"` in next.config.ts emits a static site into ./out
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Netlify serves this site from the domain root, so no sub-path prefix.
+  # (GitHub Pages sets this to /elite-health-club in its own workflow.)
+  NEXT_PUBLIC_BASE_PATH = ""
+
+# Content-hashed build assets never change under the same name.
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
