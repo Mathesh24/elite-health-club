@@ -86,13 +86,12 @@ export default function About() {
                 ))}
               </div>
 
-              <div className="mt-4 rounded-2xl bg-neutral-dark px-6 py-6 text-white sm:px-7">
+              <div className="mt-4 rounded-2xl bg-neutral-dark px-6 py-6 text-center text-white sm:px-7">
                 <p className="text-[0.68rem] font-bold uppercase tracking-[0.24em] text-accent">
                   Our philosophy
                 </p>
                 <blockquote className="mt-3 font-display text-lg leading-7 text-white/90 sm:text-xl">
-                  Fitness is only the beginning. This is a place to recharge,
-                  reconnect and add more life to every year.
+                  Honor Your Body, Fuel Your Soul
                 </blockquote>
               </div>
             </div>
