@@ -24,7 +24,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="relative overflow-hidden bg-light py-20 sm:py-24 lg:py-28"
+      className="relative scroll-mt-24 overflow-hidden bg-light py-20 sm:py-24 lg:py-28"
       aria-label="About Elite Health Club"
     >
       <div className="pointer-events-none absolute -right-28 top-10 h-72 w-72 rounded-full bg-brand/8 blur-3xl" />
@@ -43,9 +43,8 @@ export default function About() {
 
             <div className="mt-8 max-w-2xl space-y-5 text-base leading-8 text-neutral-dark/70 sm:text-lg">
               <p>
-                Elite Health Club is a new wellness initiative created to make
-                healthier, more balanced living part of everyday life in
-                Kandukur.
+                Designed for your daily routine, Elite Health Club makes
+                whole-body wellness accessible right here in Kandukur
               </p>
               <p>
                 We bring fitness, recreation, recovery and relaxation together

@@ -61,3 +61,12 @@ select option {
   color: var(--color-neutral-dark);
   background: #F8FBFA;
 }
+
+/* Hero amenity chips need vertical room. In very short windows (a scaled 14"
+   laptop, a phone in landscape) drop them so the hero still fits one screen.
+   Unlayered, so it wins over Tailwind's `lg:flex` utility. */
+@media (max-height: 760px) {
+  .hero-highlights {
+    display: none;
+  }
+}

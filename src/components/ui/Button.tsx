@@ -29,7 +29,7 @@ export default function Button({
   ...props
 }: ButtonProps) {
   const classes = cn(
-    "inline-flex items-center justify-center rounded-full px-7 py-3 text-sm tracking-wide transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent cursor-pointer",
+    "inline-flex items-center justify-center rounded-full px-5 py-2.5 text-center text-[13px] leading-snug tracking-wide text-balance transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent cursor-pointer sm:px-7 sm:py-3 sm:text-sm",
     variantStyles[variant],
     className
   );

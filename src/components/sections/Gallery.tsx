@@ -101,7 +101,7 @@ export default function Gallery() {
   return (
     <section
       id="gallery"
-      className="overflow-hidden bg-surface py-24"
+      className="scroll-mt-24 overflow-hidden bg-surface py-24"
       aria-label="Gallery"
     >
       <div className="mx-auto max-w-7xl px-6">

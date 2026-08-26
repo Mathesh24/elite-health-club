@@ -97,7 +97,7 @@ export default function Booking() {
   return (
     <section
       id="contact"
-      className="bg-light py-24"
+      className="scroll-mt-24 bg-light py-24"
       aria-label="Contact and booking"
     >
       <div className="mx-auto max-w-7xl px-6">

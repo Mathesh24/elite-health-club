@@ -14,7 +14,7 @@ export const amenities = [
     image: "/SwimmingPool.webp",
     description:
       "Mini Olympic Sized pool aimed at Low impact & Joint friendly exercises to meet longevity goals and reset your soul every day. Surrounded by soothing greenery and Clay Walls",
-    stat: "25m Heated",
+    stat: "25 metre pool",
   },
   {
     id: "gym",
@@ -23,7 +23,6 @@ export const amenities = [
     image: "/IndoorGym.webp",
     description:
       "State of the art executive Gym with 24 hr unrestricted access to members to add years to their life.",
-    stat: "12,000 sq ft",
   },
   {
     id: "tennis",

@@ -7,7 +7,7 @@ import AnimatedSection from "@/components/ui/AnimatedSection";
 
 export default function Amenities() {
   return (
-    <section id="amenities" className="bg-surface py-24" aria-label="Amenities">
+    <section id="amenities" className="scroll-mt-24 bg-surface py-24" aria-label="Amenities">
       <div className="mx-auto max-w-7xl px-6">
         <AnimatedSection>
           <SectionHeading
