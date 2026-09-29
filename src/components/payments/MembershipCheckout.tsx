@@ -96,17 +96,83 @@ type CreateResponse = {
 };
 
 type VerifyResponse = {
-  status: "paid" | "pending" | "failed";
+  status: "paid" | "pending" | "failed" | "waiting";
   reference?: string;
-  paymentId: string;
+  paymentId?: string;
 };
 
 type Stage =
   | { kind: "form" }
   | { kind: "processing"; message: string }
-  | { kind: "paid"; reference: string; paymentId: string }
-  | { kind: "pending"; reference: string; paymentId: string }
+  | { kind: "paid"; reference: string; paymentId?: string }
+  | { kind: "pending"; reference: string; paymentId?: string }
+  | { kind: "unconfirmed"; reference: string }
   | { kind: "failed"; message: string };
+
+// Remembers an open checkout so it can be picked up again if the payment flow
+// navigates away from the page (UPI app hand-off on phones, bank redirects).
+const RESUME_KEY = "ehc-pending-payment";
+const RESUME_MAX_AGE_MS = 30 * 60_000;
+
+type ResumeState = {
+  planId: MembershipPlanId;
+  sessionId: string;
+  reference: string;
+  startedAt: number;
+};
+
+function saveResume(state: Omit<ResumeState, "startedAt">) {
+  try {
+    sessionStorage.setItem(
+      RESUME_KEY,
+      JSON.stringify({ ...state, startedAt: Date.now() })
+    );
+  } catch {}
+}
+
+function readResume(): ResumeState | null {
+  try {
+    const state = JSON.parse(sessionStorage.getItem(RESUME_KEY) ?? "null");
+    return state && Date.now() - state.startedAt < RESUME_MAX_AGE_MS ? state : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearResume() {
+  try {
+    sessionStorage.removeItem(RESUME_KEY);
+  } catch {}
+}
+
+// Zoho documents close() as async, but the India widget returns undefined and
+// can throw if the widget already closed itself. Never let it break our flow.
+function closeWidget(instance: ZPaymentsInstance) {
+  try {
+    void Promise.resolve(instance.close()).catch(() => undefined);
+  } catch {}
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Asks our server whether the session has been paid. Resolves only once it
+// has; the caller aborts it when the widget reports back first.
+async function pollUntilPaid(sessionId: string, signal: AbortSignal) {
+  const deadline = Date.now() + 16 * 60_000;
+  await sleep(5_000);
+  while (!signal.aborted && Date.now() < deadline) {
+    try {
+      const result = await postJson<VerifyResponse>("/api/payments/verify", {
+        sessionId,
+      });
+      if (result.status === "paid") return result;
+    } catch {}
+    await sleep(4_000);
+  }
+  return new Promise<never>(() => undefined);
+}
 
 export default function MembershipCheckout({
   planId,
@@ -193,10 +259,18 @@ export default function MembershipCheckout({
       },
     });
 
-    let paymentId: string;
-    try {
-      setStage({ kind: "processing", message: "Complete your payment in the secure window…" });
-      const result = await instance.requestPaymentMethod({
+    saveResume({
+      planId,
+      sessionId: session.sessionId,
+      reference: session.reference,
+    });
+    setStage({ kind: "processing", message: "Complete your payment in the secure window…" });
+
+    // Race the widget's own result against our server's view of the session:
+    // after card authentication the widget doesn't always report back.
+    const poller = new AbortController();
+    const widgetOutcome = instance
+      .requestPaymentMethod({
         amount: String(session.amount),
         currency_code: "INR",
         currency_symbol: "₹",
@@ -209,42 +283,116 @@ export default function MembershipCheckout({
           email: values.email,
           phone: values.phone.replace(/[\s-]/g, ""),
         },
-      });
-      if (!result.payment_id) throw new Error("No payment id returned");
-      paymentId = String(result.payment_id);
-    } catch (error) {
-      const code = (error as { code?: string }).code;
-      setFormError(
-        code === "widget_closed"
-          ? "Payment was cancelled. You can try again whenever you're ready."
-          : "The payment didn't go through. If any amount was debited, it will be refunded automatically. Please try again."
+      })
+      .then(
+        (result) => ({
+          kind: "widget" as const,
+          paymentId: result.payment_id ? String(result.payment_id) : null,
+        }),
+        (error: { code?: string }) => ({
+          kind: "widget-error" as const,
+          code: error?.code,
+        })
       );
-      setStage({ kind: "form" });
+    const polledOutcome = pollUntilPaid(session.sessionId, poller.signal).then(
+      (result) => ({ kind: "polled" as const, result })
+    );
+
+    const outcome = await Promise.race([widgetOutcome, polledOutcome]);
+    poller.abort();
+    closeWidget(instance);
+
+    if (outcome.kind === "polled") {
+      finish(outcome.result, session.reference);
       return;
-    } finally {
-      await instance.close().catch(() => undefined);
     }
 
     setStage({ kind: "processing", message: "Confirming your payment…" });
-    try {
-      const verification = await postJson<VerifyResponse>(
-        "/api/payments/verify",
-        { paymentId, sessionId: session.sessionId }
-      );
-      if (verification.status === "paid") {
-        setStage({ kind: "paid", reference: session.reference, paymentId });
-      } else if (verification.status === "pending") {
-        setStage({ kind: "pending", reference: session.reference, paymentId });
-      } else {
-        setStage({
-          kind: "failed",
-          message: `We couldn't confirm this payment. If money was debited, it will be refunded automatically, or contact us quoting payment ID ${paymentId}.`,
-        });
+
+    if (outcome.kind === "widget" && outcome.paymentId) {
+      try {
+        const verification = await postJson<VerifyResponse>(
+          "/api/payments/verify",
+          { paymentId: outcome.paymentId, sessionId: session.sessionId }
+        );
+        finish(verification, session.reference);
+      } catch {
+        finish(
+          { status: "pending", paymentId: outcome.paymentId },
+          session.reference
+        );
       }
-    } catch {
-      setStage({ kind: "pending", reference: session.reference, paymentId });
+      return;
     }
+
+    // The widget closed or errored. The customer may still have paid just
+    // before it closed, so check once with the server before saying so.
+    try {
+      const check = await postJson<VerifyResponse>("/api/payments/verify", {
+        sessionId: session.sessionId,
+      });
+      if (check.status === "paid") {
+        finish(check, session.reference);
+        return;
+      }
+    } catch {}
+
+    clearResume();
+    setFormError(
+      outcome.kind === "widget-error" && outcome.code === "widget_closed"
+        ? "Payment was cancelled. You can try again whenever you're ready."
+        : "The payment didn't go through. If any amount was debited, it will be refunded automatically. Please try again."
+    );
+    setStage({ kind: "form" });
   };
+
+  function finish(result: VerifyResponse, reference: string) {
+    clearResume();
+    if (result.status === "paid") {
+      setStage({ kind: "paid", reference, paymentId: result.paymentId });
+    } else if (result.status === "failed") {
+      setStage({
+        kind: "failed",
+        message: `We couldn't confirm this payment. If money was debited, it will be refunded automatically, or contact us quoting reference ${reference}.`,
+      });
+    } else {
+      setStage({ kind: "pending", reference, paymentId: result.paymentId });
+    }
+  }
+
+  // Pick up a checkout that was interrupted by a page navigation.
+  useEffect(() => {
+    const resume = readResume();
+    if (!resume || resume.planId !== planId) return;
+
+    let cancelled = false;
+    const resumeCheckout = async () => {
+      setOpen(true);
+      setStage({ kind: "processing", message: "Confirming your payment…" });
+      for (let attempt = 0; attempt < 8 && !cancelled; attempt++) {
+        try {
+          const result = await postJson<VerifyResponse>("/api/payments/verify", {
+            sessionId: resume.sessionId,
+          });
+          if (result.status === "paid") {
+            if (!cancelled) finish(result, resume.reference);
+            return;
+          }
+        } catch {}
+        await sleep(3_000);
+      }
+      // Not confirmed yet. They may not have paid at all, or the webhook may
+      // still record it and email them, so don't claim either.
+      if (!cancelled) {
+        clearResume();
+        setStage({ kind: "unconfirmed", reference: resume.reference });
+      }
+    };
+    void resumeCheckout();
+    return () => {
+      cancelled = true;
+    };
+  }, [planId]);
 
   const inputClass =
     "w-full rounded-lg border border-neutral-dark/15 bg-white px-4 py-3 text-sm text-neutral-dark placeholder:text-neutral-dark/30 transition-colors focus:border-brand focus:outline-none";
@@ -319,6 +467,16 @@ export default function MembershipCheckout({
                 body="We're waiting for final confirmation from the payment provider. You'll get an email once it's confirmed; there's no need to pay again."
                 reference={stage.reference}
                 paymentId={stage.paymentId}
+                onClose={() => setOpen(false)}
+              />
+            )}
+
+            {stage.kind === "unconfirmed" && (
+              <Outcome
+                icon={<Clock3 size={40} className="text-accent" />}
+                title="We haven't received a payment yet"
+                body="If you completed the payment, you'll receive a confirmation email within a few minutes, so please don't pay again. If you didn't finish, you can start again anytime."
+                reference={stage.reference}
                 onClose={() => setOpen(false)}
               />
             )}

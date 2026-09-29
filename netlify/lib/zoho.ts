@@ -23,6 +23,7 @@ export type ZohoPaymentSession = {
   reference_number?: string;
   description?: string;
   meta_data?: MetaData;
+  payments?: { payment_id: string | number; status: string }[];
 };
 
 export type ZohoPayment = {
