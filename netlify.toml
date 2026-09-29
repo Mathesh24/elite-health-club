@@ -9,6 +9,31 @@
   # (GitHub Pages sets this to /elite-health-club in its own workflow.)
   NEXT_PUBLIC_BASE_PATH = ""
 
+# Payment backend (Zoho Payments). Shared code lives in netlify/lib.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Shows or hides the "Become a Member" checkout buttons at build time.
+# Production stays enquiry-only until go-live; previews get the checkout so it
+# can be tested against the Zoho sandbox. Server-side credentials and the
+# PAYMENTS_ENABLED switch live in the Netlify UI (functions can't read
+# variables set in this file).
+[context.production.environment]
+  NEXT_PUBLIC_PAYMENTS_ENABLED = "false"
+
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_PAYMENTS_ENABLED = "true"
+
+[context.branch-deploy.environment]
+  NEXT_PUBLIC_PAYMENTS_ENABLED = "true"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Robots-Tag = "noindex"
+
 # Content-hashed build assets never change under the same name.
 [[headers]]
   for = "/_next/static/*"

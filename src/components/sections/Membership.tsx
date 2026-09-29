@@ -1,6 +1,11 @@
 import { Check, Clock3, Crown, Ticket, User } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/Button";
+import MembershipCheckout from "@/components/payments/MembershipCheckout";
+
+// Build-time switch, set per Netlify deploy context in netlify.toml. Turning it
+// off restores the enquiry-only buttons.
+const paymentsEnabled = process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === "true";
 
 const individualBenefits = [
   "Dedicated app and web platform for seamless access to club amenities",
@@ -128,9 +133,26 @@ export default function Membership() {
               <BenefitList benefits={individualBenefits} />
             </div>
 
-            <Button href="#contact" variant="outline" className="mt-7 w-full">
-              Enquire About Individual Membership
-            </Button>
+            {paymentsEnabled ? (
+              <div className="mt-7 space-y-3">
+                <MembershipCheckout
+                  planId="individual"
+                  label="Become a Member"
+                  variant="outline"
+                  className="w-full"
+                />
+                <a
+                  href="#contact"
+                  className="block text-center text-sm text-neutral-dark/55 underline underline-offset-4 transition-colors hover:text-brand"
+                >
+                  Have questions? Enquire first
+                </a>
+              </div>
+            ) : (
+              <Button href="#contact" variant="outline" className="mt-7 w-full">
+                Enquire About Individual Membership
+              </Button>
+            )}
           </article>
 
           <article className="relative flex h-full flex-col overflow-hidden rounded-3xl bg-neutral-dark p-6 text-white shadow-2xl sm:p-8">
@@ -181,9 +203,25 @@ export default function Membership() {
                 <BenefitList benefits={familyBenefits} featured />
               </div>
 
-              <Button href="#contact" variant="primary" className="mt-7 w-full">
-                Enquire About Family Membership
-              </Button>
+              {paymentsEnabled ? (
+                <div className="mt-7 space-y-3">
+                  <MembershipCheckout
+                    planId="family"
+                    label="Become a Member"
+                    className="w-full"
+                  />
+                  <a
+                    href="#contact"
+                    className="block text-center text-sm text-white/55 underline underline-offset-4 transition-colors hover:text-accent"
+                  >
+                    Have questions? Enquire first
+                  </a>
+                </div>
+              ) : (
+                <Button href="#contact" variant="primary" className="mt-7 w-full">
+                  Enquire About Family Membership
+                </Button>
+              )}
             </div>
           </article>
         </div>

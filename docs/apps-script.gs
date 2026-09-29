@@ -7,6 +7,10 @@
  *   3. Deploy > Manage deployments > edit the EXISTING deployment >
  *      Version: "New version" > Deploy.  This keeps the same /exec URL.
  *
+ *   4. For membership payments, also set the Script Properties described in
+ *      the "Membership payments" section below, then authorise MailApp by
+ *      running sendTestEmail() once from the editor.
+ *
  * Editing and saving this file does NOT update the live web app —
  * you must deploy a new version.
  */
@@ -73,6 +77,11 @@ function doPost(e) {
 
     var data = JSON.parse(e.postData.contents);
 
+    // Payment events come from the Netlify payment functions, not the browser.
+    if (typeof data.action === "string" && data.action.indexOf("payment_") === 0) {
+      return json(handlePaymentEvent(data));
+    }
+
     // Honeypot: real users never see this field, bots fill it in.
     if (data.website) {
       return json({ status: "ignored" });
@@ -118,4 +127,208 @@ function json(payload) {
   return ContentService.createTextOutput(JSON.stringify(payload)).setMimeType(
     ContentService.MimeType.JSON
   );
+}
+
+/* ------------------------------------------------------------------------- *
+ * Membership payments
+ *
+ * Called only by the Netlify payment functions (netlify/lib/sheet.ts), which
+ * have already verified the payment with Zoho. Requests must carry the shared
+ * secret stored in Script Properties:
+ *   Project Settings > Script Properties
+ *     PAYMENTS_SECRET      long random string, same as Netlify's
+ *                          PAYMENTS_SHEET_SECRET
+ *     CLUB_NOTIFY_EMAIL    where new-membership alerts go (comma-separated ok)
+ * ------------------------------------------------------------------------- */
+
+var PAYMENTS_SHEET_NAME = "Payments";
+
+var PAYMENT_HEADERS = [
+  "Created At",
+  "Status",
+  "Plan",
+  "Amount (INR)",
+  "Name",
+  "Email",
+  "Phone",
+  "Reference",
+  "Session ID",
+  "Payment ID",
+  "Payment Method",
+  "Confirmed At",
+  "Confirmed Via",
+  "Environment",
+];
+
+// 1-based column indexes into PAYMENT_HEADERS.
+var PAY_COL = {
+  status: 2,
+  phone: 7,
+  sessionId: 9,
+  paymentId: 10,
+  method: 11,
+  confirmedAt: 12,
+  confirmedVia: 13,
+};
+
+function handlePaymentEvent(data) {
+  var expected = PropertiesService.getScriptProperties().getProperty(
+    "PAYMENTS_SECRET"
+  );
+  if (!expected || data.secret !== expected) {
+    return { status: "error", message: "Unauthorized" };
+  }
+
+  var sheet = getPaymentsSheet();
+  var sessionId = String(data.sessionId || "");
+  if (!sessionId) {
+    return { status: "error", message: "Missing sessionId" };
+  }
+  var row = findRowBySessionId(sheet, sessionId);
+
+  if (data.action === "payment_created") {
+    if (row) return { status: "duplicate" };
+    appendPaymentRow(sheet, data, "created");
+    return { status: "success" };
+  }
+
+  if (data.action === "payment_update") {
+    if (!row) row = appendPaymentRow(sheet, data, "created");
+
+    var current = sheet.getRange(row, PAY_COL.status).getValue();
+    // Browser verification and the webhook both report the same payment;
+    // only the first confirmation writes and sends emails.
+    if (current === "succeeded") return { status: "duplicate" };
+
+    sheet.getRange(row, PAY_COL.status).setValue(data.status || "");
+    sheet.getRange(row, PAY_COL.paymentId).setValue(String(data.paymentId || ""));
+    sheet.getRange(row, PAY_COL.method).setValue(data.method || "");
+    sheet
+      .getRange(row, PAY_COL.confirmedAt)
+      .setNumberFormat(TIMESTAMP_FORMAT)
+      .setValue(new Date());
+    sheet.getRange(row, PAY_COL.confirmedVia).setValue(data.source || "");
+
+    if (data.status === "succeeded") {
+      sendPaymentEmails(data);
+    }
+    return { status: "success" };
+  }
+
+  return { status: "error", message: "Unknown action" };
+}
+
+function getPaymentsSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(PAYMENTS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(PAYMENTS_SHEET_NAME);
+    sheet.appendRow(PAYMENT_HEADERS);
+    sheet.getRange(1, 1, 1, PAYMENT_HEADERS.length).setFontWeight("bold");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function findRowBySessionId(sheet, sessionId) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return 0;
+  var match = sheet
+    .getRange(2, PAY_COL.sessionId, lastRow - 1, 1)
+    .createTextFinder(sessionId)
+    .matchEntireCell(true)
+    .findNext();
+  return match ? match.getRow() : 0;
+}
+
+function appendPaymentRow(sheet, data, status) {
+  var row = sheet.getLastRow() + 1;
+  // Keep IDs and phone numbers as text so Sheets doesn't mangle them.
+  sheet.getRange(row, 1, 1, PAYMENT_HEADERS.length).setNumberFormat("@");
+  sheet.getRange(row, 1).setNumberFormat(TIMESTAMP_FORMAT);
+  sheet.getRange(row, 4).setNumberFormat("#,##0");
+  sheet.getRange(row, 1, 1, PAYMENT_HEADERS.length).setValues([
+    [
+      new Date(),
+      status,
+      data.plan || "",
+      Number(data.amount) || "",
+      data.name || "",
+      data.email || "",
+      data.phone || "",
+      data.reference || "",
+      String(data.sessionId || ""),
+      "",
+      "",
+      "",
+      "",
+      data.environment || "",
+    ],
+  ]);
+  return row;
+}
+
+var PLAN_NAMES = {
+  individual: "Individual Membership (5 years)",
+  family: "Executive Family Membership (5 years)",
+};
+
+function sendPaymentEmails(data) {
+  var planName = PLAN_NAMES[data.plan] || data.plan;
+  var amount = "Rs. " + Number(data.amount).toLocaleString("en-IN");
+  var isTest = data.environment !== "live";
+  var subjectPrefix = isTest ? "[TEST] " : "";
+
+  var details =
+    "Plan: " + planName + "\n" +
+    "Amount paid: " + amount + " (incl. 18% GST)\n" +
+    "Reference: " + data.reference + "\n" +
+    "Payment ID: " + data.paymentId + "\n";
+
+  if (data.email) {
+    try {
+      MailApp.sendEmail({
+        to: data.email,
+        subject: subjectPrefix + "Welcome to Elite Health Club - payment received",
+        body:
+          "Dear " + (data.name || "Member") + ",\n\n" +
+          "Thank you for joining Elite Health Club. We have received your payment.\n\n" +
+          details + "\n" +
+          "Our team will contact you shortly to complete your membership onboarding. " +
+          "Your GST invoice will be shared separately.\n\n" +
+          "For any questions, reply to this email or call +91 81878 61777.\n\n" +
+          "Warm regards,\nElite Health Club",
+      });
+    } catch (error) {
+      console.error("Member email failed: " + error);
+    }
+  }
+
+  var notify = PropertiesService.getScriptProperties().getProperty(
+    "CLUB_NOTIFY_EMAIL"
+  );
+  if (notify) {
+    try {
+      MailApp.sendEmail({
+        to: notify,
+        subject: subjectPrefix + "New membership payment: " + planName,
+        body:
+          "A new membership payment has been confirmed.\n\n" +
+          "Name: " + data.name + "\n" +
+          "Email: " + data.email + "\n" +
+          "Phone: " + data.phone + "\n" +
+          details +
+          "Confirmed via: " + data.source + "\n\n" +
+          "Next: issue the GST invoice and contact the member for onboarding.",
+      });
+    } catch (error) {
+      console.error("Club email failed: " + error);
+    }
+  }
+}
+
+/** Run once from the editor to grant email permission and check delivery. */
+function sendTestEmail() {
+  var to = PropertiesService.getScriptProperties().getProperty("CLUB_NOTIFY_EMAIL");
+  MailApp.sendEmail(to, "[TEST] Elite Health Club payments email check", "It works.");
 }
