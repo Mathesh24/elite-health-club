@@ -1,6 +1,6 @@
 import { getMembershipPlan, type MembershipPlan } from "../../src/lib/membership-plans";
 import { getZohoConfig } from "./config";
-import { recordPaymentEvent } from "./sheet";
+import { recordPaymentEvent, type SheetPaymentEvent } from "./sheet";
 import { getPayment, getPaymentSession, readMeta } from "./zoho";
 
 export type ConfirmationResult =
@@ -16,8 +16,18 @@ const PENDING_STATUSES = new Set(["initiated", "incomplete"]);
 // replayed request can at most trigger a harmless re-check.
 export async function confirmPayment(
   paymentId: string,
-  options: { expectedSessionId?: string; source: "browser" | "webhook" }
+  options: {
+    expectedSessionId?: string;
+    source: "browser" | "webhook";
+    // Lets the browser path record in the background. The webhook awaits the
+    // write so a failure returns 5xx and Zoho retries.
+    record?: (write: () => Promise<void>) => Promise<void>;
+  }
 ): Promise<ConfirmationResult> {
+  const record = (event: SheetPaymentEvent) =>
+    options.record
+      ? options.record(() => recordPaymentEvent(event))
+      : recordPaymentEvent(event);
   const payment = await getPayment(paymentId);
   const sessionId = String(payment.payments_session_id ?? "");
 
@@ -40,7 +50,7 @@ export async function confirmPayment(
     payment.currency === "INR";
 
   const status = payment.status;
-  const record = {
+  const details = {
     sessionId,
     reference: session.reference_number ?? readMeta(session.meta_data, "ref"),
     plan: plan.id,
@@ -60,23 +70,23 @@ export async function confirmPayment(
       plan: plan.id,
       amount: payment.amount,
     });
-    await recordPaymentEvent({
+    await record({
       action: "payment_update",
-      ...record,
+      ...details,
       status: "amount_mismatch",
     });
     return { status: "mismatch", paymentId, reason: "amount mismatch" };
   }
 
   if (status === "succeeded") {
-    await recordPaymentEvent({ action: "payment_update", ...record, status });
-    return { status: "paid", plan, reference: record.reference, paymentId };
+    await record({ action: "payment_update", ...details, status });
+    return { status: "paid", plan, reference: details.reference, paymentId };
   }
 
   if (PENDING_STATUSES.has(status)) {
     return { status: "pending", paymentId };
   }
 
-  await recordPaymentEvent({ action: "payment_update", ...record, status });
+  await record({ action: "payment_update", ...details, status });
   return { status: "failed", paymentId };
 }

@@ -1,7 +1,14 @@
 import { z } from "zod";
 import { paymentsEnabled } from "../lib/config";
 import { confirmPayment } from "../lib/confirm";
-import { clientIp, isRateLimited, isSameOrigin, json } from "../lib/http";
+import {
+  clientIp,
+  inBackground,
+  isRateLimited,
+  isSameOrigin,
+  json,
+  type FunctionContext,
+} from "../lib/http";
 import { getPaymentSession } from "../lib/zoho";
 
 // POST /api/payments/verify
@@ -18,7 +25,7 @@ const schema = z.object({
   sessionId: z.string().regex(/^\d{1,30}$/),
 });
 
-export default async function handler(request: Request, context: { ip?: string }) {
+export default async function handler(request: Request, context: FunctionContext) {
   if (request.method !== "POST") {
     return json({ error: "Method not allowed" }, 405);
   }
@@ -59,6 +66,7 @@ export default async function handler(request: Request, context: { ip?: string }
     const result = await confirmPayment(paymentId, {
       expectedSessionId: sessionId,
       source: "browser",
+      record: (write) => inBackground(context, write, "Sheet payment write"),
     });
 
     if (result.status === "paid") {

@@ -5,7 +5,14 @@ import {
   getMembershipPlan,
 } from "../../src/lib/membership-plans";
 import { ConfigError, getZohoConfig, paymentsEnabled } from "../lib/config";
-import { clientIp, isRateLimited, isSameOrigin, json } from "../lib/http";
+import {
+  clientIp,
+  inBackground,
+  isRateLimited,
+  isSameOrigin,
+  json,
+  type FunctionContext,
+} from "../lib/http";
 import { recordPaymentEvent } from "../lib/sheet";
 import { createPaymentSession } from "../lib/zoho";
 
@@ -26,7 +33,7 @@ const schema = z.object({
   website: z.string().max(0).optional(), // honeypot
 });
 
-export default async function handler(request: Request, context: { ip?: string }) {
+export default async function handler(request: Request, context: FunctionContext) {
   if (request.method !== "POST") {
     return json({ error: "Method not allowed" }, 405);
   }
@@ -68,10 +75,12 @@ export default async function handler(request: Request, context: { ip?: string }
     });
 
     // Log the attempt so abandoned checkouts show up as leads. The payment
-    // itself doesn't depend on this, so a sheet outage mustn't block it.
-    await recordPaymentEvent({
+    // doesn't depend on this, so it runs after responding and a sheet outage
+    // can't block checkout.
+    const sessionId = String(session.payments_session_id);
+    await inBackground(context, () => recordPaymentEvent({
       action: "payment_created",
-      sessionId: String(session.payments_session_id),
+      sessionId,
       reference,
       plan: plan.id,
       amount: plan.totalAmountRupees,
@@ -79,10 +88,10 @@ export default async function handler(request: Request, context: { ip?: string }
       email: input.email,
       phone,
       environment: config.environment,
-    }).catch((error) => console.error(error));
+    }), "Sheet lead write");
 
     return json({
-      sessionId: String(session.payments_session_id),
+      sessionId,
       reference,
       amount: plan.totalAmountRupees,
       description: `${plan.name} (${plan.termYears} years)`,

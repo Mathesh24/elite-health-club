@@ -1,5 +1,26 @@
 // Small helpers shared by the payment functions.
 
+// The parts of Netlify's function context we use.
+export type FunctionContext = {
+  ip?: string;
+  waitUntil?: (promise: Promise<unknown>) => void;
+};
+
+// Runs work after the response has been sent, so the customer isn't kept
+// waiting on it. Falls back to awaiting where waitUntil isn't available.
+export async function inBackground(
+  context: FunctionContext | undefined,
+  task: () => Promise<unknown>,
+  label: string
+) {
+  const run = task().catch((error) => console.error(`${label} failed`, error));
+  if (context?.waitUntil) {
+    context.waitUntil(run);
+  } else {
+    await run;
+  }
+}
+
 export function json(body: unknown, status = 200) {
   return Response.json(body, {
     status,
@@ -19,7 +40,7 @@ export function isSameOrigin(request: Request) {
   }
 }
 
-export function clientIp(request: Request, context?: { ip?: string }) {
+export function clientIp(request: Request, context?: FunctionContext) {
   return (
     context?.ip ??
     request.headers.get("x-nf-client-connection-ip") ??
