@@ -8,6 +8,11 @@
   # Netlify serves this site from the domain root, so no sub-path prefix.
   # (GitHub Pages sets this to /elite-health-club in its own workflow.)
   NEXT_PUBLIC_BASE_PATH = ""
+  # These payment settings are stored as Netlify secrets but aren't sensitive,
+  # and their values ("true", "sandbox", the public enquiry-form URL, the
+  # widget key) legitimately appear in the build output. The OAuth, webhook and
+  # sheet secrets are still scanned.
+  SECRETS_SCAN_OMIT_KEYS = "PAYMENTS_ENABLED,ZOHO_PAY_ENV,ZOHO_PAY_ACCOUNT_ID,ZOHO_PAY_WIDGET_API_KEY,PAYMENTS_SHEET_WEB_APP_URL"
 
 # Payment backend (Zoho Payments). Shared code lives in netlify/lib.
 [functions]
