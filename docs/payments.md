@@ -74,6 +74,7 @@ credentials for *Production* only. Mark every value labelled secret as
 
 - [ ] Client approved Terms, Refund and Privacy text; `LEGAL_INFO` (legal name, GSTIN) filled in `src/lib/constants.ts`
 - [ ] Production-scoped live variables set in Netlify: `ZOHO_PAY_ENV=live`, live widget key, live refresh token, live webhook signing key, `PAYMENTS_ENABLED=true`
+- [ ] Emails come from the club, not a personal account: either transfer the Sheet + Apps Script to the club Gmail and redeploy the web app (update both Sheet URL variables in Netlify), or move sending to a transactional provider on a club domain address
 - [ ] Live webhook registered against `https://elitehealthclub.in/api/payments/webhook`
 - [ ] `NEXT_PUBLIC_PAYMENTS_ENABLED = "true"` for production in `netlify.toml`
 - [ ] One real low-value payment end-to-end, then refunded from the Zoho dashboard
