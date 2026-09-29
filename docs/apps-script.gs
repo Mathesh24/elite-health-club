@@ -268,6 +268,11 @@ function appendPaymentRow(sheet, data, status) {
   return row;
 }
 
+// Customer replies go to the club inbox, whichever Google account owns this
+// script and therefore sends the email.
+var SENDER_NAME = "Elite Health Club";
+var CLUB_REPLY_TO = "Elitehealthclubkdkr@gmail.com";
+
 var PLAN_NAMES = {
   individual: "Individual Membership (5 years)",
   family: "Executive Family Membership (5 years)",
@@ -289,6 +294,8 @@ function sendPaymentEmails(data) {
     try {
       MailApp.sendEmail({
         to: data.email,
+        name: SENDER_NAME,
+        replyTo: CLUB_REPLY_TO,
         subject: subjectPrefix + "Welcome to Elite Health Club - payment received",
         body:
           "Dear " + (data.name || "Member") + ",\n\n" +
@@ -311,6 +318,8 @@ function sendPaymentEmails(data) {
     try {
       MailApp.sendEmail({
         to: notify,
+        name: SENDER_NAME,
+        replyTo: data.email || CLUB_REPLY_TO,
         subject: subjectPrefix + "New membership payment: " + planName,
         body:
           "A new membership payment has been confirmed.\n\n" +
@@ -330,5 +339,11 @@ function sendPaymentEmails(data) {
 /** Run once from the editor to grant email permission and check delivery. */
 function sendTestEmail() {
   var to = PropertiesService.getScriptProperties().getProperty("CLUB_NOTIFY_EMAIL");
-  MailApp.sendEmail(to, "[TEST] Elite Health Club payments email check", "It works.");
+  MailApp.sendEmail({
+    to: to,
+    name: SENDER_NAME,
+    replyTo: CLUB_REPLY_TO,
+    subject: "[TEST] Elite Health Club payments email check",
+    body: "It works. Membership payment emails will be sent from this account.",
+  });
 }
