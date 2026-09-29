@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils";
 import Button from "@/components/ui/Button";
 import Image from "next/image";
 
+// Anchors go through the home page so they also work from the policy pages.
+const HOME = `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/`;
+
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -41,7 +44,7 @@ export default function Navbar() {
       >
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           {/* Logo */}
-          <a href="#" className="relative z-10 flex items-center gap-2">
+          <a href={HOME} className="relative z-10 flex items-center gap-2">
             <Image
               src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/logo1.png`}
               alt="Elite Health Club"
@@ -57,7 +60,7 @@ export default function Navbar() {
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
                 <a
-                  href={link.href}
+                  href={`${HOME}${link.href}`}
                   className={cn(
                     "text-sm font-medium transition-colors",
                     scrolled
@@ -73,7 +76,7 @@ export default function Navbar() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:block">
-            <Button href="#plans" variant="primary">
+            <Button href={`${HOME}#plans`} variant="primary">
               Join Now
             </Button>
           </div>
@@ -106,7 +109,7 @@ export default function Navbar() {
             {NAV_LINKS.map((link, i) => (
               <motion.a
                 key={link.href}
-                href={link.href}
+                href={`${HOME}${link.href}`}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.05 * i }}
@@ -117,7 +120,7 @@ export default function Navbar() {
               </motion.a>
             ))}
             <Button
-              href="#plans"
+              href={`${HOME}#plans`}
               variant="primary"
               onClick={() => setMobileOpen(false)}
             >

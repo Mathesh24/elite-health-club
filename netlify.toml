@@ -8,6 +8,44 @@
   # Netlify serves this site from the domain root, so no sub-path prefix.
   # (GitHub Pages sets this to /elite-health-club in its own workflow.)
   NEXT_PUBLIC_BASE_PATH = ""
+  # These payment settings are stored as Netlify secrets but aren't sensitive,
+  # and their values ("true", "sandbox", the public enquiry-form URL, the
+  # widget key) legitimately appear in the build output. The OAuth, webhook and
+  # sheet secrets are still scanned.
+  SECRETS_SCAN_OMIT_KEYS = "PAYMENTS_ENABLED,ZOHO_PAY_ENV,ZOHO_PAY_ACCOUNT_ID,ZOHO_PAY_WIDGET_API_KEY,PAYMENTS_SHEET_WEB_APP_URL"
+
+# Payment backend (Zoho Payments). Shared code lives in netlify/lib.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Shows or hides the "Become a Member" checkout buttons at build time.
+# Production stays enquiry-only until go-live; previews get the checkout so it
+# can be tested against the Zoho sandbox. Server-side credentials and the
+# PAYMENTS_ENABLED switch live in the Netlify UI (functions can't read
+# variables set in this file).
+[context.production.environment]
+  NEXT_PUBLIC_PAYMENTS_ENABLED = "false"
+
+[context.deploy-preview.environment]
+  NEXT_PUBLIC_PAYMENTS_ENABLED = "true"
+
+[context.branch-deploy.environment]
+  NEXT_PUBLIC_PAYMENTS_ENABLED = "true"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Robots-Tag = "noindex"
+
+# The looping hero video was being re-validated and re-downloaded on every
+# loop (max-age=0), competing with checkout requests. Rename the file when
+# replacing it, or expect up to a day of staleness.
+[[headers]]
+  for = "/video1.mp4"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
 
 # Content-hashed build assets never change under the same name.
 [[headers]]

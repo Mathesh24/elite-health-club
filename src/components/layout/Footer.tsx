@@ -4,6 +4,14 @@ import { Globe, Send, CirclePlay, ArrowUp } from "lucide-react";
 import { NAV_LINKS, CONTACT_INFO } from "@/lib/constants";
 import Image from "next/image";
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+const POLICY_LINKS = [
+  { label: "Terms & Conditions", href: `${BASE_PATH}/terms/` },
+  { label: "Refund Policy", href: `${BASE_PATH}/refund-policy/` },
+  { label: "Privacy Policy", href: `${BASE_PATH}/privacy-policy/` },
+];
+
 export default function Footer() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -43,7 +51,7 @@ export default function Footer() {
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
                   <a
-                    href={link.href}
+                    href={`${BASE_PATH}/${link.href}`}
                     className="text-sm transition-colors hover:text-accent"
                   >
                     {link.label}
@@ -84,6 +92,15 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} Elite Health Club. All rights
             reserved.
           </p>
+          <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs">
+            {POLICY_LINKS.map((link) => (
+              <li key={link.href}>
+                <a href={link.href} className="transition-colors hover:text-brand">
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
           <button
             onClick={scrollToTop}
             className="flex items-center gap-1 text-xs transition-colors hover:text-accent"

@@ -2,9 +2,13 @@
 
 This is the public Elite Health Club website, built with Next.js and deployed as a static GitHub Pages site.
 
+## Membership payments
+
+Individual and Family memberships can be bought online through Zoho Payments when `NEXT_PUBLIC_PAYMENTS_ENABLED` is on. The payment backend runs as Netlify Functions. See [docs/payments.md](docs/payments.md) for the design, setup, test and go-live checklists.
+
 ## Membership enquiries
 
-The public website does not collect membership payments. Membership and guest-access calls to action direct visitors to the contact form so the club team can confirm current terms and follow up on each enquiry. Submitted enquiries are stored in Google Sheets.
+Guest access, and memberships when online payments are switched off, direct visitors to the contact form so the club team can confirm current terms and follow up on each enquiry. Submitted enquiries are stored in Google Sheets.
 
 ### Connect the enquiry form to Google Sheets
 
