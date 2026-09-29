@@ -200,6 +200,20 @@ export default function MembershipCheckout({
 
   const busy = stage.kind === "processing";
 
+  // Pause background videos while checkout is open: the looping hero video
+  // otherwise keeps downloading and delays the payment requests behind it on
+  // slower connections.
+  useEffect(() => {
+    if (!open) return;
+    const paused = [...document.querySelectorAll("video")].filter(
+      (video) => !video.paused
+    );
+    paused.forEach((video) => video.pause());
+    return () => {
+      paused.forEach((video) => void video.play().catch(() => undefined));
+    };
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const previousOverflow = document.body.style.overflow;

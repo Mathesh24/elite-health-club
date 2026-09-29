@@ -39,6 +39,14 @@
     Cache-Control = "no-store"
     X-Robots-Tag = "noindex"
 
+# The looping hero video was being re-validated and re-downloaded on every
+# loop (max-age=0), competing with checkout requests. Rename the file when
+# replacing it, or expect up to a day of staleness.
+[[headers]]
+  for = "/video1.mp4"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
 # Content-hashed build assets never change under the same name.
 [[headers]]
   for = "/_next/static/*"
