@@ -65,7 +65,7 @@ export default async function handler(request: Request, context: FunctionContext
 
   try {
     const config = getZohoConfig();
-    const amount = checkoutAmount(plan, config.environment);
+    const amount = checkoutAmount(plan);
     const session = await createPaymentSession({
       amount,
       description: `${description} - Elite Health Club`,
@@ -91,15 +91,6 @@ export default async function handler(request: Request, context: FunctionContext
       });
       throw new Error("Zoho returned an unexpected session amount or currency");
     }
-    if (config.environment === "sandbox") {
-      console.info("Sandbox checkout amount", {
-        sessionId: session.payments_session_id,
-        expectedAmount: amount,
-        sessionAmount: session.amount,
-        currency: session.currency,
-      });
-    }
-
     // Log the attempt so abandoned checkouts show up as leads. The payment
     // doesn't depend on this, so it runs after responding and a sheet outage
     // can't block checkout.

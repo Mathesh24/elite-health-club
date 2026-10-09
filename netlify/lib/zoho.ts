@@ -1,7 +1,4 @@
 import { getZohoConfig } from "./config";
-import { createHash } from "node:crypto";
-import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 
 // Thin client for the Zoho Payments REST API.
 // Docs: https://www.zoho.com/in/payments/api/v1/introduction/
@@ -51,39 +48,7 @@ let cachedToken: { value: string; expiresAt: number } | null = null;
 let pendingRefresh: Promise<string> | null = null;
 let retryAfter = 0;
 
-// Netlify Dev reloads function modules independently. Share tokens locally so
-// create/verify/webhook and hot reloads don't repeatedly mint OAuth tokens.
-// This private, Git-ignored cache is used only by Netlify Dev.
-function localTokenPath() {
-  if (process.env.NETLIFY_DEV !== "true") return null;
-  const config = getZohoConfig();
-  const key = createHash("sha256").update(JSON.stringify([
-    config.environment, config.accountId, config.clientId,
-    config.clientSecret, config.refreshToken,
-  ])).digest("hex");
-  return join(process.cwd(), ".netlify", "oauth-cache", `${key}.json`);
-}
-
-async function saveLocalToken() {
-  const path = localTokenPath();
-  if (!path) return;
-  await mkdir(join(process.cwd(), ".netlify", "oauth-cache"), { recursive: true, mode: 0o700 });
-  const temporaryPath = `${path}.${process.pid}.tmp`;
-  await writeFile(temporaryPath, JSON.stringify({ token: cachedToken, retryAfter }), { mode: 0o600 });
-  await rename(temporaryPath, path);
-}
-
 async function getAccessToken(): Promise<string> {
-  const path = localTokenPath();
-  if (path) {
-    try {
-      const saved = JSON.parse(await readFile(path, "utf8"));
-      if (typeof saved.token?.value === "string" && saved.token.expiresAt > Date.now() + 60_000) {
-        cachedToken = saved.token;
-      }
-      if (typeof saved.retryAfter === "number") retryAfter = Math.max(retryAfter, saved.retryAfter);
-    } catch { /* No reusable local token yet. */ }
-  }
   if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) {
     return cachedToken.value;
   }
@@ -120,7 +85,6 @@ async function refreshAccessToken(): Promise<string> {
   if (!response.ok || !body.access_token) {
     if (response.status === 429 || (body.error === "Access Denied" && body.error_description?.includes("too many requests"))) {
       retryAfter = Date.now() + 10 * 60_000;
-      await saveLocalToken();
       throw new ZohoApiError("Zoho token refresh failed: temporary token-generation throttle", 429);
     }
     throw new ZohoApiError(
@@ -134,7 +98,6 @@ async function refreshAccessToken(): Promise<string> {
     expiresAt: Date.now() + (body.expires_in ?? 3600) * 1000,
   };
   retryAfter = 0;
-  await saveLocalToken();
   return cachedToken.value;
 }
 
@@ -163,8 +126,6 @@ async function zohoRequest<T>(
   if (!response.ok || !body || (body.code !== undefined && body.code !== 0)) {
     if (response.status === 401) {
       cachedToken = null;
-      const path = localTokenPath();
-      if (path) await unlink(path).catch(() => undefined);
     }
     throw new ZohoApiError(
       `Zoho ${init.method ?? "GET"} ${path} failed: ${body?.message ?? response.status}`,

@@ -21,8 +21,16 @@ export function paymentsEnabled() {
 }
 
 export function getZohoConfig() {
-  const environment: ZohoEnvironment =
-    process.env.ZOHO_PAY_ENV?.trim() === "live" ? "live" : "sandbox";
+  const environment = required("ZOHO_PAY_ENV");
+  if (environment !== "sandbox" && environment !== "live") {
+    throw new ConfigError("ZOHO_PAY_ENV must be sandbox or live");
+  }
+  if (process.env.CONTEXT === "production" && environment !== "live") {
+    throw new ConfigError("Production requires live Zoho credentials");
+  }
+  // Do not accept money without the required recording and recovery setup.
+  getSheetConfig();
+  if (environment === "live") getWebhookSigningKey();
 
   return {
     environment,
@@ -46,5 +54,8 @@ export function getWebhookSigningKey() {
 export function getSheetConfig() {
   const url = process.env.PAYMENTS_SHEET_WEB_APP_URL?.trim();
   const secret = process.env.PAYMENTS_SHEET_SECRET?.trim();
-  return url && secret ? { url, secret } : null;
+  if (!url || !secret) {
+    throw new ConfigError("Payment Sheet URL and secret are required");
+  }
+  return { url, secret };
 }

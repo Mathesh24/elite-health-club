@@ -20,12 +20,11 @@
   node_bundler = "esbuild"
 
 # Shows or hides the "Become a Member" checkout buttons at build time.
-# Production stays enquiry-only until go-live; previews get the checkout so it
-# can be tested against the Zoho sandbox. Server-side credentials and the
+# Production uses live payments; previews use the sandbox. Server-side credentials and the
 # PAYMENTS_ENABLED switch live in the Netlify UI (functions can't read
 # variables set in this file).
 [context.production.environment]
-  NEXT_PUBLIC_PAYMENTS_ENABLED = "false"
+  NEXT_PUBLIC_PAYMENTS_ENABLED = "true"
 
 [context.deploy-preview.environment]
   NEXT_PUBLIC_PAYMENTS_ENABLED = "true"

@@ -7,7 +7,11 @@
  *   3. Deploy > Manage deployments > edit the EXISTING deployment >
  *      Version: "New version" > Deploy.  This keeps the same /exec URL.
  *
- *   4. For membership payments, also set the Script Properties described in
+ *   4. Deploy while signed in as Elitehealthclubkdkr@gmail.com with
+ *      "Execute as: Me". MailApp sends from the deployment account; setting
+ *      replyTo does not change the From address. If replacing a deployment
+ *      owned by another account, update both Apps Script URLs in Netlify.
+ *   5. For membership payments, also set the Script Properties described in
  *      the "Membership payments" section below, then authorise MailApp by
  *      running sendTestEmail() once from the editor.
  *
@@ -200,6 +204,9 @@ function handlePaymentEvent(data) {
     // only the first confirmation writes and sends emails.
     if (current === "succeeded") return { status: "duplicate" };
 
+    // Check sender setup before marking succeeded, so a misconfigured
+    // deployment remains retryable after the owner fixes it.
+    if (data.status === "succeeded") assertClubSender();
     sheet.getRange(row, PAY_COL.status).setValue(data.status || "");
     sheet.getRange(row, PAY_COL.paymentId).setValue(String(data.paymentId || ""));
     sheet.getRange(row, PAY_COL.method).setValue(data.method || "");
@@ -268,10 +275,18 @@ function appendPaymentRow(sheet, data, status) {
   return row;
 }
 
-// Customer replies go to the club inbox, whichever Google account owns this
-// script and therefore sends the email.
+// MailApp sends from the Google account executing the deployment. Deploy as
+// the club account; Reply-To only controls where customer replies are sent.
 var SENDER_NAME = "Elite Health Club";
-var CLUB_REPLY_TO = "Elitehealthclubkdkr@gmail.com";
+var CLUB_SENDER_EMAIL = "Elitehealthclubkdkr@gmail.com";
+var CLUB_REPLY_TO = CLUB_SENDER_EMAIL;
+
+function assertClubSender() {
+  var sender = Session.getEffectiveUser().getEmail();
+  if (sender.toLowerCase() !== CLUB_SENDER_EMAIL.toLowerCase()) {
+    throw new Error("Deploy and run as " + CLUB_SENDER_EMAIL + "; current sender is " + sender);
+  }
+}
 
 var PLAN_NAMES = {
   early_bird: "Early Bird Access (one person)",
@@ -280,6 +295,7 @@ var PLAN_NAMES = {
 };
 
 function sendPaymentEmails(data) {
+  assertClubSender();
   var planName = PLAN_NAMES[data.plan] || data.plan;
   var isEarlyBird = data.plan === "early_bird";
   var amount = "Rs. " + Number(data.amount).toLocaleString("en-IN");
@@ -342,6 +358,7 @@ function sendPaymentEmails(data) {
 
 /** Run once from the editor to grant email permission and check delivery. */
 function sendTestEmail() {
+  assertClubSender();
   var to = PropertiesService.getScriptProperties().getProperty("CLUB_NOTIFY_EMAIL");
   MailApp.sendEmail({
     to: to,

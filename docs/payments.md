@@ -31,7 +31,7 @@ endpoints are Netlify Functions rather than Next.js route handlers.
 
 | Where | Variable | Effect |
 |---|---|---|
-| `netlify.toml` per context | `NEXT_PUBLIC_PAYMENTS_ENABLED` | Shows the checkout buttons (build time). `false` in production until go-live. |
+| `netlify.toml` per context | `NEXT_PUBLIC_PAYMENTS_ENABLED` | Shows the checkout buttons (build time). `true` in production; server configuration must be complete. |
 | Netlify UI | `PAYMENTS_ENABLED` | Server-side kill switch. Anything but `true` makes the create/verify endpoints return 503. |
 | Netlify UI | `ZOHO_PAY_ENV` | `sandbox` or `live`; selects API host and OAuth scopes. |
 
@@ -53,7 +53,7 @@ credentials for *Production* only. Mark every value labelled secret as
    URI `http://localhost:8765/callback`.
 2. **Refresh token** — in your own terminal: `node scripts/zoho-oauth.mjs token`
    (add `--live` for production).
-3. **Webhook** — once the site URL exists:
+3. **Webhook** — once the site URL exists (before enabling checkout):
    `node scripts/zoho-oauth.mjs webhook https://<site>/api/payments/webhook`
    (add `--live` for production). The signing key is shown once.
 4. **Apps Script** — paste `docs/apps-script.gs`, set Script Properties
@@ -62,13 +62,12 @@ credentials for *Production* only. Mark every value labelled secret as
 
 ## Test checklist (sandbox)
 
-Sandbox checkout uses a simulated ₹100 amount for all plans because Zoho's
-UPI sandbox documents successful bank-account payments only at amounts up to
-₹500. The session, widget, verification, and sheet event all use ₹100; the
-membership's real price stays unchanged. Only server-created sessions marked
-with a `TEST:` reference metadata prefix in the sandbox accept this test amount. Live verification
-always requires the full membership price. Start a fresh checkout after this
-change; existing sessions retain their original amount.
+All checkout amounts match the advertised price in both sandbox and live:
+Early Bird ₹2,000, Individual ₹82,600, Family ₹2,36,000. The session, widget,
+verification, sheet and receipt all use the same amount. Start a fresh checkout
+after deploying; old ₹100 sessions are no longer accepted by verification.
+Zoho's sandbox bank-account UPI method documents success only up to ₹500, so
+use a documented sandbox card success scenario for these full-price tests.
 
 Reference: https://www.zoho.com/in/payments/developerdocs/sandbox/testing/
 
@@ -84,7 +83,7 @@ Reference: https://www.zoho.com/in/payments/developerdocs/sandbox/testing/
 
 - [ ] Client approved Terms, Refund and Privacy text; `LEGAL_INFO` (legal name, GSTIN) filled in `src/lib/constants.ts`
 - [ ] Production-scoped live variables set in Netlify: `ZOHO_PAY_ENV=live`, live widget key, live refresh token, live webhook signing key, `PAYMENTS_ENABLED=true`
-- [ ] Emails come from the club, not a personal account: either transfer the Sheet + Apps Script to the club Gmail and redeploy the web app (update both Sheet URL variables in Netlify), or move sending to a transactional provider on a club domain address
+- [ ] Deploy Apps Script as `Elitehealthclubkdkr@gmail.com` with **Execute as: Me**. The club account must have access to the backing Sheet. Set `PAYMENTS_SECRET` and `CLUB_NOTIFY_EMAIL`, authorise email sending, then run `sendTestEmail()` and inspect the actual From address. For a replacement deployment, update `NEXT_PUBLIC_GOOGLE_SHEETS_WEB_APP_URL` and `PAYMENTS_SHEET_WEB_APP_URL` in Netlify and rebuild. Reply-To alone does not change the sender.
 - [ ] Live webhook registered against `https://elitehealthclub.in/api/payments/webhook`
 - [ ] `NEXT_PUBLIC_PAYMENTS_ENABLED = "true"` for production in `netlify.toml`
 - [ ] One real low-value payment end-to-end, then refunded from the Zoho dashboard
@@ -98,3 +97,15 @@ it covers one person and has no five-year term. Access duration still needs
 to be specified by the club. Production checkout remains subject to the existing
 payment switches. Redeploy the updated `docs/apps-script.gs` web app so receipt
 emails describe Early Bird Access correctly.
+
+Production functions reject sandbox mode, missing webhook signing keys, and
+missing Sheet configuration before creating a payment. Bind `docs/apps-script.gs`
+to the existing **Elite-health-club** spreadsheet; payment details go in its
+**Payments** tab. Do not create a separate spreadsheet.
+
+OAuth caching uses only the warm function instance; no local token files are
+written. Missing/invalid `ZOHO_PAY_ENV` is rejected rather than defaulting to sandbox.
+
+Local/preview sandbox checkout can run without a webhook signing key; browser
+verification still records payments. Configure the sandbox key to test webhook
+delivery and confirmation after closing the browser. Live checkout requires it.

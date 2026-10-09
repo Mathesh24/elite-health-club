@@ -34,11 +34,6 @@ export type SheetPaymentEvent =
 
 export async function recordPaymentEvent(event: SheetPaymentEvent) {
   const config = getSheetConfig();
-  if (!config) {
-    console.warn("Payments sheet not configured; skipping", event.action);
-    return;
-  }
-
   const response = await fetch(config.url, {
     method: "POST",
     headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -50,7 +45,7 @@ export async function recordPaymentEvent(event: SheetPaymentEvent) {
     message?: string;
   } | null;
 
-  if (!response.ok || !body || body.status === "error") {
+  if (!response.ok || !body || !["success", "duplicate"].includes(body.status ?? "")) {
     throw new Error(
       `Payments sheet write failed: ${body?.message ?? response.status}`
     );

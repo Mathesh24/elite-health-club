@@ -46,10 +46,7 @@ export async function confirmPayment(
   }
 
   const environment = getZohoConfig().environment;
-  // Sessions created before sandbox test pricing still use the full price.
-  const expectedAmount = environment === "sandbox" && readMeta(session.meta_data, "ref").startsWith("TEST:")
-    ? checkoutAmount(plan, environment)
-    : plan.totalAmountRupees;
+  const expectedAmount = checkoutAmount(plan);
   const amountMatches =
     Number(payment.amount) === expectedAmount &&
     Number(session.amount) === expectedAmount &&

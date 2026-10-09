@@ -369,8 +369,8 @@ export default function MembershipCheckout({
       widget_closed: "Payment was cancelled. You can try again whenever you're ready.",
       session_expired: "This checkout session expired. Please start a new checkout.",
       invalid_payment_session: "This checkout session is invalid or expired. Please start a new checkout.",
-      paymentmethods_validation: "Payment methods are not enabled for this Zoho account. Please enable them in Zoho Payments before trying again.",
-      widget_validation_error: "Zoho could not open checkout. Please check the widget API key and account settings, then try again.",
+      paymentmethods_validation: "Online payments are temporarily unavailable. Please contact the club.",
+      widget_validation_error: "Checkout could not open. Please try again shortly.",
     };
     const errorCode = outcome.kind === "widget-error" ? outcome.code : undefined;
     const safeErrorCode = errorCode && /^[a-zA-Z0-9_-]{1,80}$/.test(errorCode)
@@ -382,7 +382,7 @@ export default function MembershipCheckout({
     }
     setFormError(
       (safeErrorCode && checkoutErrors[safeErrorCode]) ||
-        `${widgetMessage || "Checkout could not be completed. Please try again."}${safeErrorCode ? ` Error code: ${safeErrorCode}.` : ""}`
+        "Checkout could not be completed. Please try again. If money was debited, contact the club with your payment reference."
     );
     setStage({ kind: "form" });
   };
