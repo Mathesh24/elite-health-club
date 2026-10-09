@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { MapPin, Phone, Mail, Clock, CheckCircle } from "lucide-react";
 import { CONTACT_INFO } from "@/lib/constants";
+import { GOOGLE_SHEETS_WEB_APP_URL } from "@/lib/google-sheets";
 import { cn } from "@/lib/utils";
 import SectionHeading from "@/components/ui/SectionHeading";
 import AnimatedSection from "@/components/ui/AnimatedSection";
@@ -55,14 +56,7 @@ export default function Booking() {
       return;
     }
 
-    const endpoint = process.env.NEXT_PUBLIC_GOOGLE_SHEETS_WEB_APP_URL?.trim();
-
-    if (!endpoint) {
-      setSubmitError(
-        "Online enquiries are temporarily unavailable. Please call or email us instead."
-      );
-      return;
-    }
+    const endpoint = GOOGLE_SHEETS_WEB_APP_URL;
 
     setIsSubmitting(true);
     setSubmitError(null);

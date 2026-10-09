@@ -2,20 +2,24 @@
 
 This is the public Elite Health Club website, built with Next.js and deployed as a static GitHub Pages site.
 
+## Membership payments
+
+Individual and Family memberships can be bought online through Zoho Payments when `NEXT_PUBLIC_PAYMENTS_ENABLED` is on. The payment backend runs as Netlify Functions. See [docs/payments.md](docs/payments.md) for the design, setup, test and go-live checklists.
+
 ## Membership enquiries
 
-The public website does not collect membership payments. Membership and guest-access calls to action direct visitors to the contact form so the club team can confirm current terms and follow up on each enquiry. Submitted enquiries are stored in Google Sheets.
+Guest access, and memberships when online payments are switched off, direct visitors to the contact form so the club team can confirm current terms and follow up on each enquiry. Submitted enquiries are stored in Google Sheets.
 
 ### Connect the enquiry form to Google Sheets
 
 1. Create a Google Sheet and open **Extensions → Apps Script**.
-2. Replace the editor contents with `google-apps-script/Code.gs` from this repository and save it.
-3. Select **Deploy → New deployment → Web app**. Run it as yourself and allow access to anyone.
+2. Replace the editor contents with `docs/apps-script.gs` from this repository and save it.
+3. Select **Deploy → New deployment → Web app**. Deploy as `Elitehealthclubkdkr@gmail.com`, execute as that account, and allow access to anyone.
 4. Copy the deployed web-app URL.
-5. For local development, copy `.env.example` to `.env.local` and add the URL as `NEXT_PUBLIC_GOOGLE_SHEETS_WEB_APP_URL`.
-6. For GitHub Pages, add the URL as the repository Actions secret `GOOGLE_SHEETS_WEB_APP_URL`.
+5. Update the public deployment URL in `src/lib/google-sheets.ts` and push. Both enquiries and payment functions use it.
+6. Keep payment credentials and `PAYMENTS_SHEET_SECRET` in Netlify; the secret must match Apps Script’s `PAYMENTS_SECRET`.
 
-The script creates an `Enquiries` tab automatically and records the submission time, name, email, phone, enquiry type, message and source page.
+The script records enquiries in `Elite-health-club` and payment details in `Payments`. Enquiry fields include the submission time, name, email, phone, enquiry type, message and source page.
 
 ## Getting Started
 

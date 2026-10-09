@@ -233,3 +233,12 @@ export const CONTACT_INFO = {
   email: "Elitehealthclubkdkr@gmail.com",
   hours: "Mon – Sat: 5:30 AM – 10:00 PM | Sun: 7:00 AM – 8:00 PM",
 };
+
+// Shown on the policy pages and payment receipts. Fill in the registered
+// business name and GSTIN once confirmed by the club.
+export const LEGAL_INFO = {
+  legalName: "Elite Health Club",
+  gstin: "",
+  jurisdiction: "Nellore, Andhra Pradesh",
+  policiesLastUpdated: "29 September 2026",
+};

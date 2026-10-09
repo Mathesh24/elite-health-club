@@ -1,6 +1,11 @@
 import { Check, Clock3, Crown, Ticket, User } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import Button from "@/components/ui/Button";
+import MembershipCheckout from "@/components/payments/MembershipCheckout";
+
+// Build-time switch, set per Netlify deploy context in netlify.toml. Turning it
+// off restores the enquiry-only buttons.
+const paymentsEnabled = process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === "true";
 
 const individualBenefits = [
   "Dedicated app and web platform for seamless access to club amenities",
@@ -76,9 +81,32 @@ export default function Membership() {
       <div className="mx-auto max-w-7xl px-6">
         <SectionHeading
           title="Choose Your Elite Access"
-          subtitle="Select an individual or family membership for five years of club privileges, or visit with flexible non-member guest access."
+          subtitle="Explore all facilities with ₹2,000 Early Bird Access before choosing an individual or family membership for five years of club privileges."
           className="!mb-10 sm:!mb-14"
         />
+
+        <article className="mx-auto mb-6 grid max-w-6xl gap-6 rounded-3xl border border-brand/20 bg-white p-6 shadow-md sm:p-8 lg:grid-cols-[1.4fr_1fr] lg:items-center">
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-brand">Explore before you join</p>
+            <h3 className="font-display text-3xl font-bold text-neutral-dark">Early Bird Access</h3>
+            <p className="mt-3 text-sm leading-relaxed text-neutral-dark/70">
+              For one person to explore Elite Health Club with access to all facilities before purchasing an individual or family membership.
+            </p>
+            <div className="mt-5">
+              <BenefitList benefits={["Access for one person to all club facilities", "Explore the club before choosing your membership", "Our team coordinates your access after payment"]} />
+            </div>
+          </div>
+          <div className="rounded-2xl bg-light p-6">
+            <p className="font-display text-4xl font-bold text-brand">₹2,000</p>
+            <p className="mt-1 text-sm text-neutral-dark/55">Total payable · includes 18% GST</p>
+            {paymentsEnabled ? (
+              <MembershipCheckout planId="early_bird" label="Get Early Bird Access" className="mt-5 w-full" />
+            ) : (
+              <Button href="#contact" className="mt-5 w-full">Enquire About Early Bird Access</Button>
+            )}
+            <p className="mt-3 text-xs leading-relaxed text-neutral-dark/55">Facility schedules and availability apply. Contact our team for access details.</p>
+          </div>
+        </article>
 
         <div className="mx-auto grid max-w-6xl items-stretch gap-6 lg:grid-cols-2">
           <article className="flex h-full flex-col rounded-3xl border border-neutral-dark/10 bg-white p-6 shadow-md sm:p-8">
@@ -128,9 +156,26 @@ export default function Membership() {
               <BenefitList benefits={individualBenefits} />
             </div>
 
-            <Button href="#contact" variant="outline" className="mt-7 w-full">
-              Enquire About Individual Membership
-            </Button>
+            {paymentsEnabled ? (
+              <div className="mt-7 space-y-3">
+                <MembershipCheckout
+                  planId="individual"
+                  label="Become a Member"
+                  variant="outline"
+                  className="w-full"
+                />
+                <a
+                  href="#contact"
+                  className="block text-center text-sm text-neutral-dark/55 underline underline-offset-4 transition-colors hover:text-brand"
+                >
+                  Have questions? Enquire first
+                </a>
+              </div>
+            ) : (
+              <Button href="#contact" variant="outline" className="mt-7 w-full">
+                Enquire About Individual Membership
+              </Button>
+            )}
           </article>
 
           <article className="relative flex h-full flex-col overflow-hidden rounded-3xl bg-neutral-dark p-6 text-white shadow-2xl sm:p-8">
@@ -181,9 +226,25 @@ export default function Membership() {
                 <BenefitList benefits={familyBenefits} featured />
               </div>
 
-              <Button href="#contact" variant="primary" className="mt-7 w-full">
-                Enquire About Family Membership
-              </Button>
+              {paymentsEnabled ? (
+                <div className="mt-7 space-y-3">
+                  <MembershipCheckout
+                    planId="family"
+                    label="Become a Member"
+                    className="w-full"
+                  />
+                  <a
+                    href="#contact"
+                    className="block text-center text-sm text-white/55 underline underline-offset-4 transition-colors hover:text-accent"
+                  >
+                    Have questions? Enquire first
+                  </a>
+                </div>
+              ) : (
+                <Button href="#contact" variant="primary" className="mt-7 w-full">
+                  Enquire About Family Membership
+                </Button>
+              )}
             </div>
           </article>
         </div>
