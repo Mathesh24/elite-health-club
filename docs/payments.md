@@ -83,7 +83,7 @@ Reference: https://www.zoho.com/in/payments/developerdocs/sandbox/testing/
 
 - [ ] Client approved Terms, Refund and Privacy text; `LEGAL_INFO` (legal name, GSTIN) filled in `src/lib/constants.ts`
 - [ ] Production-scoped live variables set in Netlify: `ZOHO_PAY_ENV=live`, live widget key, live refresh token, live webhook signing key, `PAYMENTS_ENABLED=true`
-- [ ] Deploy Apps Script as `Elitehealthclubkdkr@gmail.com` with **Execute as: Me**. The club account must have access to the backing Sheet. Set `PAYMENTS_SECRET` and `CLUB_NOTIFY_EMAIL`, authorise email sending, then run `sendTestEmail()` and inspect the actual From address. For a replacement deployment, update `NEXT_PUBLIC_GOOGLE_SHEETS_WEB_APP_URL` and `PAYMENTS_SHEET_WEB_APP_URL` in Netlify and rebuild. Reply-To alone does not change the sender.
+- [ ] Deploy Apps Script as `Elitehealthclubkdkr@gmail.com` with **Execute as: Me**. The club account must have access to the backing Sheet. Set `PAYMENTS_SECRET` and `CLUB_NOTIFY_EMAIL`, authorise email sending, then run `sendTestEmail()` and inspect the actual From address. For a replacement deployment, update `src/lib/google-sheets.ts`, push and redeploy. Reply-To alone does not change the sender.
 - [ ] Live webhook registered against `https://elitehealthclub.in/api/payments/webhook`
 - [ ] `NEXT_PUBLIC_PAYMENTS_ENABLED = "true"` for production in `netlify.toml`
 - [ ] One real low-value payment end-to-end, then refunded from the Zoho dashboard
@@ -98,8 +98,9 @@ to be specified by the club. Production checkout remains subject to the existing
 payment switches. Redeploy the updated `docs/apps-script.gs` web app so receipt
 emails describe Early Bird Access correctly.
 
-Production functions reject sandbox mode, missing webhook signing keys, and
-missing Sheet configuration before creating a payment. Bind `docs/apps-script.gs`
+Live payments require a webhook signing key; all payments require a Sheet
+secret before creating a payment. Netlify production deploys support sandbox
+mode for testing. Bind `docs/apps-script.gs`
 to the existing **Elite-health-club** spreadsheet; payment details go in its
 **Payments** tab. Do not create a separate spreadsheet.
 
@@ -109,3 +110,13 @@ written. Missing/invalid `ZOHO_PAY_ENV` is rejected rather than defaulting to sa
 Local/preview sandbox checkout can run without a webhook signing key; browser
 verification still records payments. Configure the sandbox key to test webhook
 delivery and confirmation after closing the browser. Live checkout requires it.
+
+## Current Netlify sandbox validation
+
+The public Apps Script endpoint is configured once in `src/lib/google-sheets.ts`
+and shared by enquiries and payment functions. Old URL environment variables
+are no longer read, so pushing a URL change updates both flows on deployment.
+Keep `ZOHO_PAY_ENV=sandbox` and matching sandbox credentials in Netlify for
+testing; deploy context does not force real payments. `PAYMENTS_SHEET_SECRET`
+must match the new deployment's `PAYMENTS_SECRET`. Secret credentials remain
+in Netlify and are not committed to GitHub.

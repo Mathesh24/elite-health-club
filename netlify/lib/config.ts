@@ -1,5 +1,7 @@
+import { GOOGLE_SHEETS_WEB_APP_URL } from "../../src/lib/google-sheets";
+
 // Server-side configuration for the payment functions. Everything here comes
-// from Netlify environment variables (Site configuration → Environment
+// from the public endpoint above and Netlify environment variables (Site configuration → Environment
 // variables), scoped per deploy context so sandbox and live credentials never
 // mix. None of these are exposed to the browser except the widget API key,
 // which Zoho designs to be public.
@@ -25,9 +27,6 @@ export function getZohoConfig() {
   if (environment !== "sandbox" && environment !== "live") {
     throw new ConfigError("ZOHO_PAY_ENV must be sandbox or live");
   }
-  if (process.env.CONTEXT === "production" && environment !== "live") {
-    throw new ConfigError("Production requires live Zoho credentials");
-  }
   // Do not accept money without the required recording and recovery setup.
   getSheetConfig();
   if (environment === "live") getWebhookSigningKey();
@@ -52,10 +51,10 @@ export function getWebhookSigningKey() {
 }
 
 export function getSheetConfig() {
-  const url = process.env.PAYMENTS_SHEET_WEB_APP_URL?.trim();
+  const url = GOOGLE_SHEETS_WEB_APP_URL;
   const secret = process.env.PAYMENTS_SHEET_SECRET?.trim();
-  if (!url || !secret) {
-    throw new ConfigError("Payment Sheet URL and secret are required");
+  if (!secret) {
+    throw new ConfigError("Payment Sheet secret is required");
   }
   return { url, secret };
 }

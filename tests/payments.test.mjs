@@ -235,12 +235,12 @@ const liveEnv = {
   PAYMENTS_SHEET_SECRET: "sheet-secret",
 };
 
-test("production requires live mode, Sheet recording and webhook setup", () => {
+test("live payments require valid mode, Sheet secret and webhook setup", () => {
   assert.equal(load("netlify/lib/config.ts", { env: liveEnv }).getZohoConfig().environment, "live");
   for (const patch of [
-    { ZOHO_PAY_ENV: "sandbox" }, { ZOHO_PAY_ENV: "" },
+    { ZOHO_PAY_ENV: "" },
     { ZOHO_PAY_ENV: "invalid" }, { PAYMENTS_SHEET_SECRET: "" },
-    { PAYMENTS_SHEET_WEB_APP_URL: "" }, { ZOHO_PAY_WEBHOOK_SIGNING_KEY: "" },
+    { ZOHO_PAY_WEBHOOK_SIGNING_KEY: "" },
   ]) {
     const config = load("netlify/lib/config.ts", { env: { ...liveEnv, ...patch } });
     assert.throws(() => config.getZohoConfig(), config.ConfigError);
@@ -249,12 +249,19 @@ test("production requires live mode, Sheet recording and webhook setup", () => {
 
 test("missing Sheet setup fails instead of silently dropping payment details", async () => {
   const { recordPaymentEvent } = load("netlify/lib/sheet.ts");
-  await assert.rejects(recordPaymentEvent({ action: "payment_update" }), /Sheet URL and secret/);
+  await assert.rejects(recordPaymentEvent({ action: "payment_update" }), /Sheet secret/);
 });
 
-test("local sandbox checkout does not require a webhook signing key", () => {
-  const env = { ...liveEnv, CONTEXT: "dev", ZOHO_PAY_ENV: "sandbox", ZOHO_PAY_WEBHOOK_SIGNING_KEY: "" };
+test("sandbox checkout works on the deployed site without a webhook signing key", () => {
+  const env = { ...liveEnv, CONTEXT: "production", ZOHO_PAY_ENV: "sandbox", ZOHO_PAY_WEBHOOK_SIGNING_KEY: "" };
   const config = load("netlify/lib/config.ts", { env });
   assert.equal(config.getZohoConfig().environment, "sandbox");
   assert.throws(() => config.getWebhookSigningKey(), config.ConfigError);
+});
+
+test("payment recording uses the club deployment despite a stale Netlify URL", () => {
+  const { GOOGLE_SHEETS_WEB_APP_URL } = load("src/lib/google-sheets.ts");
+  const config = load("netlify/lib/config.ts", { env: { ...liveEnv, PAYMENTS_SHEET_WEB_APP_URL: "https://old.example/exec" } });
+  assert.equal(config.getSheetConfig().url, GOOGLE_SHEETS_WEB_APP_URL);
+  assert.ok(GOOGLE_SHEETS_WEB_APP_URL.includes("AKfycbzh4V7cUB9WY5riQgctZoI-HwnAAvl0N7OJ4Vd_0ciJ5UIA6VkFA7jhqeFnpdt6u_UmJQ"));
 });
