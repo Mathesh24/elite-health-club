@@ -5,6 +5,13 @@
 export const GST_RATE_PERCENT = 18;
 
 export const MEMBERSHIP_PLANS = {
+  early_bird: {
+    id: "early_bird",
+    name: "Early Bird Access",
+    baseAmountRupees: 1_694.92,
+    totalAmountRupees: 2_000,
+    termYears: null,
+  },
   individual: {
     id: "individual",
     name: "Individual Membership",

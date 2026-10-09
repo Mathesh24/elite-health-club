@@ -274,12 +274,14 @@ var SENDER_NAME = "Elite Health Club";
 var CLUB_REPLY_TO = "Elitehealthclubkdkr@gmail.com";
 
 var PLAN_NAMES = {
+  early_bird: "Early Bird Access (one person)",
   individual: "Individual Membership (5 years)",
   family: "Executive Family Membership (5 years)",
 };
 
 function sendPaymentEmails(data) {
   var planName = PLAN_NAMES[data.plan] || data.plan;
+  var isEarlyBird = data.plan === "early_bird";
   var amount = "Rs. " + Number(data.amount).toLocaleString("en-IN");
   var isTest = data.environment !== "live";
   var subjectPrefix = isTest ? "[TEST] " : "";
@@ -301,7 +303,9 @@ function sendPaymentEmails(data) {
           "Dear " + (data.name || "Member") + ",\n\n" +
           "Thank you for joining Elite Health Club. We have received your payment.\n\n" +
           details + "\n" +
-          "Our team will contact you shortly to complete your membership onboarding. " +
+          (isEarlyBird
+            ? "Our team will contact you to coordinate your Early Bird Access to all club facilities before you choose an individual or family membership. "
+            : "Our team will contact you shortly to complete your membership onboarding. ") +
           "Your GST invoice will be shared separately.\n\n" +
           "For any questions, reply to this email or call +91 81878 61777.\n\n" +
           "Warm regards,\nElite Health Club",
@@ -320,15 +324,15 @@ function sendPaymentEmails(data) {
         to: notify,
         name: SENDER_NAME,
         replyTo: data.email || CLUB_REPLY_TO,
-        subject: subjectPrefix + "New membership payment: " + planName,
+        subject: subjectPrefix + "New club payment: " + planName,
         body:
-          "A new membership payment has been confirmed.\n\n" +
+          "A new club payment has been confirmed.\n\n" +
           "Name: " + data.name + "\n" +
           "Email: " + data.email + "\n" +
           "Phone: " + data.phone + "\n" +
           details +
           "Confirmed via: " + data.source + "\n\n" +
-          "Next: issue the GST invoice and contact the member for onboarding.",
+          (isEarlyBird ? "Next: issue the GST invoice and coordinate Early Bird Access." : "Next: issue the GST invoice and contact the member for onboarding."),
       });
     } catch (error) {
       console.error("Club email failed: " + error);

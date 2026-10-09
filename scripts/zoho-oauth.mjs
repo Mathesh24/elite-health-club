@@ -16,7 +16,11 @@ import { createServer } from "node:http";
 import { execFile } from "node:child_process";
 import { createInterface } from "node:readline";
 
-const ACCOUNT_ID = process.env.ZOHO_PAY_ACCOUNT_ID ?? "60082980858";
+const ACCOUNT_ID = process.env.ZOHO_PAY_ACCOUNT_ID?.trim();
+if (!ACCOUNT_ID) {
+  console.error("Set ZOHO_PAY_ACCOUNT_ID before running this helper.");
+  process.exit(1);
+}
 const REDIRECT_URI = "http://localhost:8765/callback";
 const ACCOUNTS = "https://accounts.zoho.in";
 

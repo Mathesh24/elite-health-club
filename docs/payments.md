@@ -62,7 +62,17 @@ credentials for *Production* only. Mark every value labelled secret as
 
 ## Test checklist (sandbox)
 
-- [ ] Individual and Family: pay → success screen → sheet row `succeeded` → both emails (subject prefixed `[TEST]`)
+Sandbox checkout uses a simulated ₹100 amount for all plans because Zoho's
+UPI sandbox documents successful bank-account payments only at amounts up to
+₹500. The session, widget, verification, and sheet event all use ₹100; the
+membership's real price stays unchanged. Only server-created sessions marked
+with a `TEST:` reference metadata prefix in the sandbox accept this test amount. Live verification
+always requires the full membership price. Start a fresh checkout after this
+change; existing sessions retain their original amount.
+
+Reference: https://www.zoho.com/in/payments/developerdocs/sandbox/testing/
+
+- [ ] Early Bird, Individual and Family: pay → success screen → sheet row `succeeded` → both emails (subject prefixed `[TEST]`)
 - [ ] Close the widget → "Payment was cancelled", can retry
 - [ ] Failed payment (sandbox test failure method) → sheet row `failed`, no email
 - [ ] Close the tab right after paying → webhook still marks the row `succeeded`
@@ -78,3 +88,13 @@ credentials for *Production* only. Mark every value labelled secret as
 - [ ] Live webhook registered against `https://elitehealthclub.in/api/payments/webhook`
 - [ ] `NEXT_PUBLIC_PAYMENTS_ENABLED = "true"` for production in `netlify.toml`
 - [ ] One real low-value payment end-to-end, then refunded from the Zoho dashboard
+
+## Early Bird Access
+
+`early_bird` is ₹2,000 total (including GST) in live mode and uses the same
+Zoho session, widget, verification and webhook flow as memberships. It provides
+access to all facilities before choosing an individual or family membership;
+it covers one person and has no five-year term. Access duration still needs
+to be specified by the club. Production checkout remains subject to the existing
+payment switches. Redeploy the updated `docs/apps-script.gs` web app so receipt
+emails describe Early Bird Access correctly.

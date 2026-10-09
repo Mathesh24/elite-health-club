@@ -1,10 +1,11 @@
 import { getMembershipPlan, type MembershipPlan } from "../../src/lib/membership-plans";
 import { getZohoConfig } from "./config";
+import { checkoutAmount } from "./checkout-amount";
 import { recordPaymentEvent, type SheetPaymentEvent } from "./sheet";
 import { getPayment, getPaymentSession, readMeta } from "./zoho";
 
 export type ConfirmationResult =
-  | { status: "paid"; plan: MembershipPlan; reference: string; paymentId: string }
+  | { status: "paid"; plan: MembershipPlan; reference: string; paymentId: string; amount: number }
   | { status: "pending" | "failed"; paymentId: string }
   | { status: "mismatch"; paymentId: string; reason: string };
 
@@ -44,10 +45,15 @@ export async function confirmPayment(
     return { status: "mismatch", paymentId, reason: "unknown plan" };
   }
 
+  const environment = getZohoConfig().environment;
+  // Sessions created before sandbox test pricing still use the full price.
+  const expectedAmount = environment === "sandbox" && readMeta(session.meta_data, "ref").startsWith("TEST:")
+    ? checkoutAmount(plan, environment)
+    : plan.totalAmountRupees;
   const amountMatches =
-    Number(payment.amount) === plan.totalAmountRupees &&
-    Number(session.amount) === plan.totalAmountRupees &&
-    payment.currency === "INR";
+    Number(payment.amount) === expectedAmount &&
+    Number(session.amount) === expectedAmount &&
+    session.currency === "INR" && payment.currency === "INR";
 
   const status = payment.status;
   const details = {
@@ -58,7 +64,7 @@ export async function confirmPayment(
     name: readMeta(session.meta_data, "name"),
     email: readMeta(session.meta_data, "email"),
     phone: readMeta(session.meta_data, "phone"),
-    environment: getZohoConfig().environment,
+    environment,
     paymentId,
     method: payment.payment_method?.type ?? "",
     source: options.source,
@@ -80,7 +86,7 @@ export async function confirmPayment(
 
   if (status === "succeeded") {
     await record({ action: "payment_update", ...details, status });
-    return { status: "paid", plan, reference: details.reference, paymentId };
+    return { status: "paid", plan, reference: details.reference, paymentId, amount: expectedAmount };
   }
 
   if (PENDING_STATUSES.has(status)) {

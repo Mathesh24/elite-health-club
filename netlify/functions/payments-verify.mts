@@ -9,7 +9,7 @@ import {
   json,
   type FunctionContext,
 } from "../lib/http";
-import { getPaymentSession } from "../lib/zoho";
+import { getPaymentSession, ZohoApiError } from "../lib/zoho";
 
 // POST /api/payments/verify
 // Called by the browser once the checkout widget reports a payment, and polled
@@ -75,7 +75,7 @@ export default async function handler(request: Request, context: FunctionContext
         reference: result.reference,
         paymentId: result.paymentId,
         plan: result.plan.name,
-        amount: result.plan.totalAmountRupees,
+        amount: result.amount,
       });
     }
     if (result.status === "mismatch") {
@@ -87,6 +87,9 @@ export default async function handler(request: Request, context: FunctionContext
     // The webhook will still record the payment; tell the customer it's being
     // confirmed rather than that it failed.
     console.error("Payment verification failed", error);
+    if (error instanceof ZohoApiError && error.message.startsWith("Zoho token refresh failed:")) {
+      return json({ error: "Payment verification is temporarily unavailable. Please try again later." }, 503);
+    }
     return json(
       polling
         ? { status: "waiting" }

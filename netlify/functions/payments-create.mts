@@ -5,6 +5,7 @@ import {
   getMembershipPlan,
 } from "../../src/lib/membership-plans";
 import { ConfigError, getZohoConfig, paymentsEnabled } from "../lib/config";
+import { checkoutAmount } from "../lib/checkout-amount";
 import {
   clientIp,
   inBackground,
@@ -14,7 +15,7 @@ import {
   type FunctionContext,
 } from "../lib/http";
 import { recordPaymentEvent } from "../lib/sheet";
-import { createPaymentSession } from "../lib/zoho";
+import { createPaymentSession, ZohoApiError } from "../lib/zoho";
 
 // POST /api/payments/create
 // Starts checkout: validates the customer's details, creates a Zoho payment
@@ -54,6 +55,9 @@ export default async function handler(request: Request, context: FunctionContext
 
   const input = parsed.data;
   const plan = getMembershipPlan(input.planId)!;
+  const description = plan.termYears
+    ? `${plan.name} (${plan.termYears} years)`
+    : `${plan.name} - one person, all facilities before choosing a membership`;
   const reference = `EHC-${plan.id.slice(0, 3).toUpperCase()}-${Date.now()
     .toString(36)
     .toUpperCase()}-${randomBytes(2).toString("hex").toUpperCase()}`;
@@ -61,18 +65,40 @@ export default async function handler(request: Request, context: FunctionContext
 
   try {
     const config = getZohoConfig();
+    const amount = checkoutAmount(plan, config.environment);
     const session = await createPaymentSession({
-      amount: plan.totalAmountRupees,
-      description: `${plan.name} (${plan.termYears} years) - Elite Health Club`,
+      amount,
+      description: `${description} - Elite Health Club`,
       referenceNumber: reference,
       metaData: [
         { key: "plan", value: plan.id },
-        { key: "ref", value: reference },
+        { key: "ref", value: config.environment === "sandbox" ? `TEST:${reference}` : reference },
         { key: "name", value: input.name },
         { key: "email", value: input.email },
         { key: "phone", value: phone },
       ],
     });
+
+    if (
+      Number(session.amount) !== amount ||
+      session.currency !== "INR"
+    ) {
+      console.error("Zoho session amount mismatch", {
+        sessionId: session.payments_session_id,
+        expectedAmount: amount,
+        sessionAmount: session.amount,
+        currency: session.currency,
+      });
+      throw new Error("Zoho returned an unexpected session amount or currency");
+    }
+    if (config.environment === "sandbox") {
+      console.info("Sandbox checkout amount", {
+        sessionId: session.payments_session_id,
+        expectedAmount: amount,
+        sessionAmount: session.amount,
+        currency: session.currency,
+      });
+    }
 
     // Log the attempt so abandoned checkouts show up as leads. The payment
     // doesn't depend on this, so it runs after responding and a sheet outage
@@ -83,7 +109,7 @@ export default async function handler(request: Request, context: FunctionContext
       sessionId,
       reference,
       plan: plan.id,
-      amount: plan.totalAmountRupees,
+      amount,
       name: input.name,
       email: input.email,
       phone,
@@ -93,8 +119,8 @@ export default async function handler(request: Request, context: FunctionContext
     return json({
       sessionId,
       reference,
-      amount: plan.totalAmountRupees,
-      description: `${plan.name} (${plan.termYears} years)`,
+      amount: session.amount,
+      description,
       widget: {
         accountId: config.accountId,
         apiKey: config.widgetApiKey,
@@ -103,6 +129,9 @@ export default async function handler(request: Request, context: FunctionContext
     });
   } catch (error) {
     console.error("Payment session creation failed", error);
+    if (error instanceof ZohoApiError && error.status === 429) {
+      return json({ error: "Payments are temporarily busy. Please wait 10 minutes before trying again." }, 503);
+    }
     const message =
       error instanceof ConfigError
         ? "Online payments are not configured yet."

@@ -67,7 +67,9 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
     error?: string;
   };
   if (!response.ok) {
-    throw new Error(data.error ?? "Something went wrong. Please try again.");
+    throw Object.assign(new Error(data.error ?? "Something went wrong. Please try again."), {
+      status: response.status,
+    });
   }
   return data;
 }
@@ -90,7 +92,7 @@ type FormValues = z.infer<typeof schema>;
 type CreateResponse = {
   sessionId: string;
   reference: string;
-  amount: number;
+  amount: string | number;
   description: string;
   widget: { accountId: string; apiKey: string; testMode: boolean };
 };
@@ -168,7 +170,12 @@ async function pollUntilPaid(sessionId: string, signal: AbortSignal) {
         sessionId,
       });
       if (result.status === "paid") return result;
-    } catch {}
+    } catch (error) {
+      if ((error as { status?: number }).status === 503) {
+        // Keep waiting for the widget without repeatedly refreshing a blocked OAuth token.
+        return new Promise<never>(() => undefined);
+      }
+    }
     await sleep(4_000);
   }
   return new Promise<never>(() => undefined);
@@ -186,9 +193,11 @@ export default function MembershipCheckout({
   className?: string;
 }) {
   const plan = MEMBERSHIP_PLANS[planId];
+  const isEarlyBird = planId === "early_bird";
   const [open, setOpen] = useState(false);
   const [stage, setStage] = useState<Stage>({ kind: "form" });
   const [formError, setFormError] = useState<string | null>(null);
+  const [testAmount, setTestAmount] = useState<number | null>(null);
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -230,6 +239,7 @@ export default function MembershipCheckout({
   }, [open, busy]);
 
   const openDialog = () => {
+    setTestAmount(null);
     setStage({ kind: "form" });
     setFormError(null);
     setOpen(true);
@@ -273,6 +283,8 @@ export default function MembershipCheckout({
       },
     });
 
+    setTestAmount(session.widget.testMode ? Number(session.amount) : null);
+
     saveResume({
       planId,
       sessionId: session.sessionId,
@@ -303,9 +315,10 @@ export default function MembershipCheckout({
           kind: "widget" as const,
           paymentId: result.payment_id ? String(result.payment_id) : null,
         }),
-        (error: { code?: string }) => ({
+        (error: { code?: string; message?: string }) => ({
           kind: "widget-error" as const,
           code: error?.code,
+          message: typeof error?.message === "string" ? error.message.slice(0, 300) : undefined,
         })
       );
     const polledOutcome = pollUntilPaid(session.sessionId, poller.signal).then(
@@ -352,10 +365,24 @@ export default function MembershipCheckout({
     } catch {}
 
     clearResume();
+    const checkoutErrors: Record<string, string> = {
+      widget_closed: "Payment was cancelled. You can try again whenever you're ready.",
+      session_expired: "This checkout session expired. Please start a new checkout.",
+      invalid_payment_session: "This checkout session is invalid or expired. Please start a new checkout.",
+      paymentmethods_validation: "Payment methods are not enabled for this Zoho account. Please enable them in Zoho Payments before trying again.",
+      widget_validation_error: "Zoho could not open checkout. Please check the widget API key and account settings, then try again.",
+    };
+    const errorCode = outcome.kind === "widget-error" ? outcome.code : undefined;
+    const safeErrorCode = errorCode && /^[a-zA-Z0-9_-]{1,80}$/.test(errorCode)
+      ? errorCode
+      : undefined;
+    const widgetMessage = outcome.kind === "widget-error" ? outcome.message : undefined;
+    if (process.env.NODE_ENV === "development" && outcome.kind === "widget-error") {
+      console.error("Zoho checkout error", { code: safeErrorCode, message: widgetMessage });
+    }
     setFormError(
-      outcome.kind === "widget-error" && outcome.code === "widget_closed"
-        ? "Payment was cancelled. You can try again whenever you're ready."
-        : "The payment didn't go through. If any amount was debited, it will be refunded automatically. Please try again."
+      (safeErrorCode && checkoutErrors[safeErrorCode]) ||
+        `${widgetMessage || "Checkout could not be completed. Please try again."}${safeErrorCode ? ` Error code: ${safeErrorCode}.` : ""}`
     );
     setStage({ kind: "form" });
   };
@@ -392,7 +419,9 @@ export default function MembershipCheckout({
             if (!cancelled) finish(result, resume.reference);
             return;
           }
-        } catch {}
+        } catch (error) {
+          if ((error as { status?: number }).status === 503) break;
+        }
         await sleep(3_000);
       }
       // Not confirmed yet. They may not have paid at all, or the webhook may
@@ -449,25 +478,38 @@ export default function MembershipCheckout({
             )}
 
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.22em] text-brand">
-              Membership checkout
+              {isEarlyBird ? "Early Bird checkout" : "Membership checkout"}
             </p>
             <h3 id={titleId} className="pr-8 font-display text-2xl font-bold">
               {plan.name}
             </h3>
             <div className="mt-4 flex items-baseline justify-between rounded-2xl bg-light px-5 py-4">
               <span className="text-sm text-neutral-dark/60">
-                {plan.termYears} years · incl. 18% GST
+                {plan.termYears ? `${plan.termYears} years · incl. 18% GST` : "All facilities · incl. 18% GST"}
               </span>
               <span className="font-display text-2xl font-bold text-brand">
                 {formatRupees(plan.totalAmountRupees)}
               </span>
             </div>
 
+            {isEarlyBird && (
+              <p className="mt-3 text-sm leading-relaxed text-neutral-dark/65">
+                Access for one person to explore all club facilities before choosing an individual or family membership.
+                Our team will coordinate your access after payment. Facility schedules and availability apply.
+              </p>
+            )}
+
+            {testAmount !== null && (
+              <p className="mt-3 text-sm text-neutral-dark/70" role="status">
+                Sandbox test: {formatRupees(testAmount)} simulated payment. No real money is charged or membership purchased.
+              </p>
+            )}
+
             {stage.kind === "paid" && (
               <Outcome
                 icon={<CheckCircle size={40} className="text-brand" />}
-                title="Welcome to Elite Health Club!"
-                body={`Your payment is confirmed. A confirmation email is on its way, and our team will contact you shortly to complete onboarding.`}
+                title={testAmount !== null ? "Test payment successful" : "Welcome to Elite Health Club!"}
+                body={testAmount !== null ? "Your sandbox payment is confirmed. No real money was charged or membership purchased." : isEarlyBird ? "Your Early Bird Access payment is confirmed. A confirmation email is on its way, and our team will contact you to coordinate your access to all facilities." : "Your payment is confirmed. A confirmation email is on its way, and our team will contact you shortly to complete onboarding."}
                 reference={stage.reference}
                 paymentId={stage.paymentId}
                 onClose={() => setOpen(false)}
